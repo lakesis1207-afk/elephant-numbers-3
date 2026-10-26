@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no" />
+    <meta name="theme-color" content="#1E2A4A" />
+    <link rel="manifest" href="./manifest.webmanifest" />
+    <link rel="icon" type="image/png" href="./icons/icon-192.png" />
+    <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-title" content="첫 숫자 놀이" />
+    <title>코끼리와 첫 숫자 놀이</title>
+  </head>
+  <body>
+    <div class="wrap">
+      <div class="stage" id="stage">
+        <div class="bg" id="bg"></div>
+        <header class="bar" id="bar" hidden></header>
+        <main class="screen" id="screen"></main>
+        <div class="toast" id="toast" role="status" hidden></div>
+      </div>
+    </div>
+    <div class="rotate" role="alert">태블릿을 가로로 돌려 주세요 🔄</div>
+    <script type="module" src="./src/main.js"></script>
+  </body>
+</html>

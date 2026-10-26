@@ -1,0 +1,12 @@
+node_modules/
+dist/
+coverage/
+test-results/
+playwright-report/
+*.log
+.DS_Store
+Thumbs.db
+# 녹음 원본 압축 파일은 올리지 않는다 (프로젝트 밖 ../녹음 원본/ 에 둔다)
+public/**/*.zip
+# 이 컴퓨터에서만 쓰는 Claude 설정
+.claude/settings.local.json
