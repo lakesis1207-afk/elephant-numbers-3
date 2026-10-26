@@ -6,7 +6,7 @@ import { cheer } from '../widgets/cheer.js';
 import { ANIMAL_NAMES, VILLAGES, gameOf, villageDone, villageOf } from '../games/villages.js';
 import { pickMission, unlockChange } from '../app/playtime.js';
 import {
-  GREETING, MAP_GUIDE, MAP_WORD, LOCK_TEXT, NOT_MET, UNLOCK_TEXT,
+  GREETING, MAP_GUIDE, LOCK_TEXT, NOT_MET, UNLOCK_TEXT,
   bookCount, lockLine, stickerLine, villageComplete,
 } from '../audio/script.js';
 
@@ -16,10 +16,9 @@ const withStar = (el, done) => {
   return el;
 };
 
-/** 지도로 돌아가며 "지도" 하고 말한다 */
+/** 지도로 돌아간다 */
 const goMap = (app) => {
   app.go('map');
-  app.say(MAP_WORD);
 };
 
 /**
@@ -37,6 +36,8 @@ function enterFullscreen() {
     .catch(() => {}); // 막혀도 앱은 그대로 쓸 수 있다
 }
 
+const PLAY_ICON = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6.5v11l9-5.5z" fill="#fff" stroke="#fff" stroke-width="2" stroke-linejoin="round"/></svg>';
+
 export const startScreen = {
   showBar: false,
   background: 'bg-savanna',
@@ -45,17 +46,20 @@ export const startScreen = {
     app.say(GREETING);
     root.addEventListener('pointerdown', (e) => {
       if (!e.target.closest('.start-btn')) app.say(GREETING);
-    });
+    }, { once: true }); // 첫 터치 때 한 번만
     // 시작 화면 어디든 처음 누르는 순간 전체 화면으로 (시작 버튼도 같다)
     root.addEventListener('pointerdown', enterFullscreen, { once: true });
     const hero = h('div', 'hero-box');
     hero.append(pic('elephant', 'hero'), h('h1', 'app-title', '코끼리와 첫 숫자 놀이'));
     root.append(hero);
-    root.append(picButton('시작', 'play', 'big-btn start-btn', () => {
+    // 시작 버튼은 빨간 동그라미 (노란 해 그림과 헷갈리지 않게)
+    const startBtn = button('시작', 'big-btn start-btn', () => {
       enterFullscreen();
       app.go('map');
       app.say(MAP_GUIDE);
-    }));
+    });
+    startBtn.innerHTML = PLAY_ICON;
+    root.append(startBtn);
   },
 };
 
@@ -143,7 +147,8 @@ export const bookScreen = {
     }
     const btabs = h('div', 'btabs');
     btabs.append(...tabs);
-    root.append(btabs, slots, picButton('스티커북 닫기', 'close', 'bookclose', () => app.go(back.name, back.params)));
+    root.append(btabs, slots);
+    app.bar.setBack(() => app.go(back.name, back.params), '스티커북 닫기');
     show(back.params?.village ?? VILLAGES[0].key);
     app.say(bookCount(stickers.length));
   },

@@ -53,7 +53,9 @@ const SHOW = {
   pattern: (q) => {
     const row = h('div', 'pattern');
     q.sequence.forEach((art) => row.append(pic(art)));
-    row.append(h('div', 'slot'));
+    const blank = h('div', 'blank');
+    blank.append(h('span', 'qmark', '?'));
+    row.append(blank);
     return row;
   },
 };
@@ -80,10 +82,10 @@ function renderFill(q, { show, choices, fill }) {
   return { hintTarget: basket };
 }
 
-/** 모양 찾기: 빈 칸(희미한 모양)에 같은 모양 넣기 */
+/** 모양 찾기: 빈 칸(물음표)에 말한 모양 넣기 */
 function renderSlot(q, { show, choices, choose }) {
   const slot = h('div', 'shape-slot');
-  slot.append(pic(q.target, 'ghost'));
+  slot.append(h('span', 'qmark', '?'));
   show.append(slot);
   const pieces = q.choices.map((c) => {
     const piece = pic(c.art, 'piece');

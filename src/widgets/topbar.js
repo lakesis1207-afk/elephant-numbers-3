@@ -1,10 +1,11 @@
-// 위쪽 막대 (4세 앱과 같은 자리·크기): 왼쪽 위 설정(부모 메뉴, 2초 누르기), 그 아래 지도(돌아가기),
+// 위쪽 막대: 왼쪽 위 설정(부모 메뉴, 2초 누르기), 오른쪽 아래 뒤로가기(빨간 화살표),
 // 가운데 문제 점, 오른쪽 스티커북(별 + 모은 개수)
-import { h, picButton } from './dom.js';
+import { h, button, picButton } from './dom.js';
 import { holdable, consumeHeld, PARENT_HOLD_MS } from './hold.js';
 
 const PARENT_TIP = '2초간 꾹 눌러주세요';
 const TIP_MS = 2000; // 안내 말풍선이 보이는 시간
+const BACK_ARROW = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 4 7 12l8 8" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 
 export function createTopbar(bar, app) {
   // 부모 메뉴: 2초 동안 누르고 있어야 열린다. 아이가 톡 누르면 설정 버튼 옆에 안내 말풍선만 뜬다.
@@ -23,7 +24,8 @@ export function createTopbar(bar, app) {
   holdable(parent, PARENT_HOLD_MS, () => app.openParentMenu());
 
   let backHandler = null;
-  const back = picButton('돌아가기', 'map', 'backbtn', () => backHandler?.());
+  const back = button('돌아가기', 'backbtn', () => backHandler?.());
+  back.innerHTML = BACK_ARROW;
   const dots = h('div', 'bar-dots');
   const count = h('b', '', '0');
   const book = picButton('스티커북', 'star', 'bookbtn', () => app.openBook());

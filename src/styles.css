@@ -30,7 +30,10 @@ button:focus-visible, .piece:focus-visible { outline: 0.6cqh solid var(--coral);
 .bar[hidden] { display: none; }
 .bar .spacer { flex: 1; pointer-events: none; }
 .pbtn { position: relative; width: 18cqh; height: 18cqh; flex: none; border-radius: 50%; background: rgba(255, 255, 255, 0.6); padding: 0.6cqh; overflow: hidden; touch-action: none; }
-.backbtn { position: absolute; left: 3cqh; top: 21cqh; width: 18cqh; height: 18cqh; }
+/* 뒤로가기: 오른쪽 아래, 빨간 동그라미 + 흰 화살표로 눈에 띄게 */
+.backbtn { position: absolute; right: 3cqh; top: 80cqh; width: 17cqh; height: 17cqh; display: grid; place-items: center; border-radius: 50%; background: var(--coral); border: 0.6cqh solid #fff; box-shadow: 0 0.8cqh 0 rgba(58, 42, 28, 0.3); }
+.backbtn svg { width: 62%; height: 62%; }
+.backbtn:active { transform: scale(0.94); }
 .backbtn[hidden], .bookbtn[hidden] { display: none; }
 .pbtn::after, .hold::after { content: ''; position: absolute; inset: 0; background: rgba(255, 200, 58, 0.45); transform: scaleX(0); transform-origin: left; pointer-events: none; }
 .pbtn.holding::after, .hold.holding::after { transition: transform var(--hold-ms, 2s) linear; transform: scaleX(1); }
@@ -48,6 +51,8 @@ button:focus-visible, .piece:focus-visible { outline: 0.6cqh solid var(--coral);
 .big-btn:active, .village-card:active, .game-card:active, .choice:active { transform: scale(0.96); }
 .hero { position: absolute; left: 12%; bottom: 6cqh; height: 62cqh; animation: bob 2.4s ease-in-out infinite; }
 .start-btn { right: 18%; top: 42%; animation: breathe 1.6s ease-in-out infinite; }
+.start-btn { display: grid; place-items: center; background: #e5392f; border: 0.8cqh solid #fff; }
+.start-btn svg { width: 66%; height: 66%; }
 .guide { position: absolute; left: 2cqh; bottom: 2cqh; height: 26cqh; }
 .badge { position: absolute; top: -2cqh; right: -2cqh; width: 9cqh; height: 9cqh; }
 
@@ -71,7 +76,7 @@ button:focus-visible, .piece:focus-visible { outline: 0.6cqh solid var(--coral);
 .bubble { position: absolute; left: 4cqh; bottom: 30cqh; width: 15cqh; height: 15cqh; padding: 3cqh; border-radius: 50%; background: var(--card); border: 0.45cqh solid var(--ink); }
 .bubble.talk { animation: bounce 0.5s ease-out; }
 .show { position: absolute; left: 22%; right: 22%; top: 13cqh; height: 34cqh; display: flex; align-items: center; justify-content: center; gap: 2cqh; }
-.choices { position: absolute; left: 20%; right: 8%; top: 50cqh; bottom: 3cqh; display: flex; gap: 6%; align-items: stretch; justify-content: center; }
+.choices { position: absolute; left: 20%; right: 14%; top: 50cqh; bottom: 3cqh; display: flex; gap: 6%; align-items: stretch; justify-content: center; }
 /* 보기는 하얀 카드 대신 옅은 바탕 + 흰 테두리로 두 묶음을 나눠 보이게 한다 */
 .choice { position: relative; flex: 1; max-width: 44%; display: grid; place-items: center; padding: 2cqh; border-radius: 4cqh; background: var(--panel-bg); border: var(--panel-line); box-shadow: var(--panel-shadow); transition: border-color 0.2s, background 0.2s; }
 .choice > .pic { height: 30cqh; }
@@ -91,7 +96,10 @@ button:focus-visible, .piece:focus-visible { outline: 0.6cqh solid var(--coral);
 .frame.peek.covered .group { visibility: hidden; }
 .pattern { display: flex; align-items: center; gap: 1.5cqh; }
 .pattern .pic, .choices.pattern .choice > .pic { height: 13cqh; }
-.pattern .slot { width: 13cqh; height: 13cqh; border-radius: 50%; border: 0.7cqh dashed var(--ink); opacity: 0.5; }
+.pattern .blank { width: 13cqh; height: 13cqh; border-radius: 50%; border: 0.7cqh dashed rgba(58, 42, 28, 0.6); background: rgba(255, 255, 255, 0.6); display: grid; place-items: center; }
+/* 빈칸 물음표 */
+.qmark { font-size: 9cqh; line-height: 1; color: var(--ink); }
+.shape-slot .qmark { font-size: 18cqh; }
 .frame > .pic, .choices.match .choice > .pic { height: 22cqh; }
 
 /* 위에 보여 줄 그림이 없는 게임은 보기를 위로 키운다 (부탁하는 친구 자리는 비워 둔다) */
@@ -107,7 +115,7 @@ button:focus-visible, .piece:focus-visible { outline: 0.6cqh solid var(--coral);
 .pos-up .mover { bottom: 52%; z-index: 3; }
 .pos-down .box { bottom: 40%; }
 .pos-down .mover { bottom: 2%; }
-.pos-in .mover { bottom: 44%; }
+.pos-in .mover { bottom: 44%; visibility: hidden; } /* 상자 안: 거북이는 안 보인다 */
 .pos-out .box { left: 42%; width: 58%; }
 .pos-out .mover { left: 0; width: 40%; bottom: 4%; z-index: 3; }
 
@@ -122,7 +130,6 @@ button:focus-visible, .piece:focus-visible { outline: 0.6cqh solid var(--coral);
 .fill-basket .tray { position: absolute; left: 16%; right: 16%; top: 30%; bottom: 10%; z-index: 2; display: flex; flex-wrap: wrap; align-content: flex-end; justify-content: center; gap: 0.6cqh; }
 .fill-basket .tray .piece { transform: none; }
 .shape-slot { width: 30cqh; height: 30cqh; display: grid; place-items: center; border-radius: 4cqh; background: var(--panel-bg); border: 0.8cqh dashed rgba(255, 255, 255, 0.95); }
-.shape-slot .ghost { height: 24cqh; filter: grayscale(1); opacity: 0.3; }
 .shape-slot .piece { height: 24cqh; }
 .choices.shape { align-items: center; gap: 12%; }
 .choices.shape .piece { height: 24cqh; }
@@ -147,7 +154,6 @@ button:focus-visible, .piece:focus-visible { outline: 0.6cqh solid var(--coral);
 .slot.has { border: 0.4cqh solid var(--ink); }
 .slot .pic { height: 28cqh; }
 .slot.miss .pic { filter: brightness(0); opacity: 0.13; }
-.bookclose { position: absolute; right: 3cqh; top: 13cqh; width: 12cqh; height: 12cqh; }
 
 /* 잠금 (4세 앱과 같은 모양: 잠든 코끼리 + 코끼리가 졸려요 + 화면 밖 미션 + 부모님 2초 누르기) */
 .screen.lock { background: linear-gradient(rgba(30, 42, 74, 0.1), rgba(30, 42, 74, 0.6)); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2cqh; padding-top: 4cqh; color: #fff; text-shadow: 0 0.4cqh 0.8cqh rgba(0, 0, 0, 0.5); }
