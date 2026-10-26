@@ -22,6 +22,21 @@ const goMap = (app) => {
   app.say(MAP_WORD);
 };
 
+/**
+ * 누르면 바로 주소창 없는 전체 화면 + 가로 고정 (4세 앱 screens/start.js와 같은 방식).
+ * 4세 앱과 달리 컴퓨터에서도 전체 화면으로 한다. 이미 홈 화면 앱으로 열었거나, 아이폰처럼 지원하지 않으면 그냥 넘어간다.
+ * 전체 화면은 누르는 순간에만 요청할 수 있어서 시작 화면을 누를 때 한다.
+ */
+function enterFullscreen() {
+  const page = document.documentElement;
+  if (!page.requestFullscreen || document.fullscreenElement) return;
+  if (matchMedia('(display-mode: fullscreen), (display-mode: standalone)').matches) return;
+  page
+    .requestFullscreen({ navigationUI: 'hide' })
+    .then(() => screen.orientation?.lock?.('landscape'))
+    .catch(() => {}); // 막혀도 앱은 그대로 쓸 수 있다
+}
+
 export const startScreen = {
   showBar: false,
   background: 'bg-savanna',
@@ -31,8 +46,13 @@ export const startScreen = {
     root.addEventListener('pointerdown', (e) => {
       if (!e.target.closest('.start-btn')) app.say(GREETING);
     });
-    root.append(pic('elephant', 'hero'));
+    // 시작 화면 어디든 처음 누르는 순간 전체 화면으로 (시작 버튼도 같다)
+    root.addEventListener('pointerdown', enterFullscreen, { once: true });
+    const hero = h('div', 'hero-box');
+    hero.append(pic('elephant', 'hero'), h('h1', 'app-title', '코끼리와 첫 숫자 놀이'));
+    root.append(hero);
     root.append(picButton('시작', 'play', 'big-btn start-btn', () => {
+      enterFullscreen();
       app.go('map');
       app.say(MAP_GUIDE);
     }));

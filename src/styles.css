@@ -181,3 +181,9 @@ button:focus-visible, .piece:focus-visible { outline: 0.6cqh solid var(--coral);
 @keyframes ptip-in { from { opacity: 0; transform: translateX(-1.5cqh); } }
 @keyframes burst { to { transform: translate(var(--x), var(--y)) rotate(200deg); opacity: 0; } }
 @media (prefers-reduced-motion: reduce) { * { animation: none !important; } }
+
+/* 시작 화면: 코끼리 밑에 앱 이름 (4세 앱과 같은 모양: 흰 글자 + 진한 테두리) */
+.hero-box { position: absolute; left: 2%; bottom: 5cqh; width: 86cqh; display: flex; flex-direction: column; align-items: center; gap: 1cqh; }
+.hero-box .hero { position: static; height: 52cqh; }
+.app-title { margin: 0; font-weight: 400; font-size: 7.4cqh; white-space: nowrap; color: #fff; letter-spacing: 0.2cqh;
+  text-shadow: 0.4cqh 0.4cqh 0 var(--ink), -0.4cqh 0.4cqh 0 var(--ink), 0.4cqh -0.4cqh 0 var(--ink), -0.4cqh -0.4cqh 0 var(--ink), 0 0.9cqh 0 var(--ink); }
