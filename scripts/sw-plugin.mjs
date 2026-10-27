@@ -1,4 +1,3 @@
-// (4세 앱 scripts/sw-plugin.mjs 복사. 같은 주소에 4세 앱이 있어도 저장본이 섞이지 않게 이름 앞을 elephant3- 로 바꿈)
 // 빌드가 끝나면 dist의 모든 파일 목록으로 오프라인 저장 파일(dist/sw.js)을 만든다.
 //  - 앱 파일: 내용이 바뀌면 저장 이름(CACHE)도 바뀌어서, 새 버전을 받으면 예전 저장본을 지운다.
 //  - 녹음(mp3): 따로 저장한다(VOICE_CACHE). 파일마다 버전(내용 해시)이 있어 바뀐 녹음만 다시 받고,
@@ -26,7 +25,7 @@ const hashOf = (...parts) => {
 
 const swSource = (cache, files, voice) => `// 자동으로 만든 파일 (scripts/sw-plugin.mjs). 직접 고치지 마세요.
 const CACHE = ${JSON.stringify(cache)};
-const VOICE_CACHE = 'elephant3-voice';
+const VOICE_CACHE = 'elephant-voice';
 const FILES = ${JSON.stringify(files)};
 const VOICE = ${JSON.stringify(voice)}; // [파일, 버전]
 
@@ -63,7 +62,7 @@ self.addEventListener('install', (event) => {
 // 바뀐 뒤에 예전 앱 저장본과, 지금 목록에 없는 녹음을 지우고, 열려 있는 화면을 새 버전이 맡는다.
 async function cleanUp() {
   const keys = await caches.keys();
-  await Promise.all(keys.filter((k) => k.startsWith('elephant3-') && k !== CACHE && k !== VOICE_CACHE).map((k) => caches.delete(k)));
+  await Promise.all(keys.filter((k) => k.startsWith('elephant-') && k !== CACHE && k !== VOICE_CACHE).map((k) => caches.delete(k)));
   const voice = await caches.open(VOICE_CACHE);
   const keep = new Set(VOICE.map(voiceUrl));
   await Promise.all((await voice.keys()).filter((r) => !keep.has(r.url)).map((r) => voice.delete(r)));
@@ -135,7 +134,7 @@ export function offlineServiceWorker() {
       const app = files.filter((f) => !isVoice(f));
       const voice = files.filter(isVoice).map((f) => [`./${f}`, hashOf(read(f))]);
       // 앱 저장 이름: 앱 파일과 저장 방식(sw.js 틀)이 같으면 그대로 (녹음만 바뀌면 앱은 다시 받지 않는다)
-      const cache = `elephant3-${hashOf(swSource('', [], []), ...app.flatMap((f) => [f, read(f)]))}`;
+      const cache = `elephant-${hashOf(swSource('', [], []), ...app.flatMap((f) => [f, read(f)]))}`;
       writeFileSync(join(outDir, SW_FILE), swSource(cache, ['./', ...app.map((f) => `./${f}`)], voice));
       console.log(`[offline] ${SW_FILE}: 앱 파일 ${app.length}개 (${cache}) + 녹음 ${voice.length}개`);
     },

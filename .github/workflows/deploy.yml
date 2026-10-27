@@ -20,17 +20,28 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
+      # 앱은 app/, 공통 코드는 공통/ 에 나란히 내려받는다 (앱의 vite.config.js가 ../공통 을 찾는다)
       - uses: actions/checkout@v4
+        with:
+          path: app
+      - uses: actions/checkout@v4
+        with:
+          repository: lakesis1207-afk/elephant-common
+          path: 공통
       - uses: actions/setup-node@v4
         with:
           node-version: 24
           cache: npm
+          cache-dependency-path: app/package-lock.json
       - run: npm ci
+        working-directory: app
       - run: npm test
+        working-directory: app
       - run: npm run build
+        working-directory: app
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: dist
+          path: app/dist
 
   deploy:
     needs: build

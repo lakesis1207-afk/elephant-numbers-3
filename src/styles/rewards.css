@@ -1,0 +1,137 @@
+/* 보상 화면과 스티커북 (시제품 CSS를 옮김). 크기는 무대 높이 기준(cqh). */
+
+/* 보상 */
+.screen.reward {
+  justify-content: center;
+  gap: 2cqh;
+  padding-top: 11cqh;
+}
+.glowbg {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 50% 42%, rgba(255, 246, 216, 0.95), rgba(255, 246, 216, 0) 55%);
+  pointer-events: none;
+}
+.reward .sticker {
+  height: 40cqh;
+  position: relative;
+  animation: pop 0.7s cubic-bezier(0.3, 1.6, 0.5, 1);
+}
+.reward .sticker.sp {
+  height: 34cqh;
+  border-radius: 50%;
+  border: 0.6cqh solid var(--ink);
+}
+.reward p {
+  margin: 0;
+  font-size: 4cqh;
+  color: var(--soft);
+  position: relative;
+}
+.reward .open {
+  display: flex;
+  align-items: center;
+  gap: 1.4cqh;
+  position: relative;
+}
+.reward .open img {
+  height: 10cqh;
+}
+.reward .open .ico {
+  width: 7cqh;
+  height: 7cqh;
+}
+.reward .rbtn {
+  position: relative;
+  width: 14cqh;
+  height: 14cqh;
+}
+@keyframes pop {
+  from {
+    transform: scale(0) rotate(-20deg);
+  }
+}
+
+/* 스티커북 */
+.screen.book {
+  justify-content: center;
+}
+.slots {
+  display: grid;
+  grid-template-columns: repeat(5, 20cqh);
+  gap: 2cqh;
+  background: rgba(255, 252, 244, 0.85);
+  border: 0.5cqh solid var(--ink);
+  border-radius: 4cqh;
+  padding: 3cqh;
+}
+.slot {
+  height: 24cqh;
+  border-radius: 3cqh;
+  background: #fff;
+  border: 0.4cqh dashed #d8c8a8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+}
+.slot.has {
+  border: 0.4cqh solid var(--ink);
+}
+.slot img {
+  height: 19cqh;
+}
+.slot.miss img {
+  filter: brightness(0);
+  opacity: 0.13;
+}
+.slot.sp img {
+  border-radius: 50%;
+  height: 17cqh;
+}
+/* 스티커북 쪽 넘기기 (마을 버튼) */
+.screen.book {
+  flex-direction: row;
+  align-items: center;
+  gap: 3cqh;
+}
+.btabs {
+  display: flex;
+  flex-direction: column;
+  gap: 1.4cqh;
+}
+.btab {
+  width: 11cqh;
+  height: 11cqh;
+  border-radius: 50%;
+  background: rgba(255, 252, 244, 0.85);
+  border: 0.45cqh solid var(--ink);
+  display: grid;
+  place-items: center;
+  opacity: 0.6;
+  box-sizing: border-box;
+}
+.btab.on {
+  opacity: 1;
+  background: var(--sun);
+  transform: scale(1.08);
+}
+.btab img {
+  height: 8.5cqh;
+}
+.btab img.round {
+  border-radius: 50%;
+}
+.bookclose {
+  position: absolute;
+  right: 3cqh;
+  top: 13cqh;
+  width: 12cqh;
+  height: 12cqh;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reward .sticker {
+    animation: none;
+  }
+}

@@ -1,80 +1,103 @@
-// 게임 화면: 9개 게임이 함께 쓰는 틀. 코끼리 + 부탁하는 친구 + 말풍선(누르면 다시 듣기) + 그림 문제.
-// 틀려도 실패 표시는 없고 "다시 해 볼까?"만 말한다. 그림은 views.js가 그린다.
-import { h, pic, button } from '../widgets/dom.js';
-import { createGameRun, QUESTIONS_PER_GAME } from '../games/engine.js';
-import { LEVELS, hintFor, makeQuestion } from '../games/questions.js';
-import { villageOf } from '../games/villages.js';
-import { NATIVE, wait } from '../games/logic.js';
-import { renderQuestion } from './views.js';
+// 게임 화면: 왼쪽 아래 코끼리 + 말풍선, 오른쪽에 게임판. 5문제를 끝내면 보상 화면(스티커)으로 간다.
+import { h, art } from '@공통/widgets/dom.js';
+import { cheer } from '../widgets/cheer.js';
+import { stopVoice } from '../audio/voice.js';
+import { createGameRun } from '@공통/games/engine.js';
+import { findGame } from '../games/index.js';
+import { finishGame } from '../app/rewards.js';
+import { findVillage } from '../villages/index.js';
 
-const HINT_MS = 900;
-const COUNT_DONE_MS = 700; // 세어 주기: 마지막 수를 말한 뒤 정답 처리까지
+// 브라우저 자동 검사가 정답을 알 수 있게 게임판에 정답을 적어 둔다.
+// 개발 서버와 검사용 빌드(VITE_E2E=1)에만 넣고, 배포본에는 넣지 않는다.
+const EXPOSE_ANSWER = import.meta.env.DEV || import.meta.env.VITE_E2E === '1';
+
+let currentRun = null;
+let currentStage = null;
+
+function createBubble(app) {
+  const text = h('span', {});
+  const el = h('button', { class: 'bubble', 'aria-label': '다시 듣기' }, art('icon', 'speaker', { class: 'spk' }), text);
+  return {
+    el,
+    set(message, speak = true) {
+      text.textContent = message;
+      if (speak) app.say(message);
+    },
+  };
+}
+
+function createGuide() {
+  const el = h('button', { class: 'guide', 'aria-label': '코끼리, 다시 듣기' }, art('character', 'elephant', { alt: '' }));
+  return {
+    el,
+    hop() {
+      el.classList.remove('happy');
+      void el.offsetWidth; // 애니메이션을 처음부터 다시
+      el.classList.add('happy');
+    },
+  };
+}
 
 export const gameScreen = {
-  background: (params) => villageOf(params.village).background,
-  render(root, app, { village: villageKey, game: gameKey }) {
-    const village = villageOf(villageKey);
-    const requester = village.animals[village.games.findIndex((g) => g.key === gameKey)];
-    app.bar.setBack(() => app.go('village', { village: villageKey }), village.name);
-    app.bar.setDots(0, QUESTIONS_PER_GAME);
+  // 게임 중에 스티커북을 열면 문제 진행이 사라지므로 숨긴다
+  showBook: false,
+  background: ({ village = 'savanna', game }) => findGame(village, game).background,
 
-    const bubble = button('다시 듣기', 'bubble', () => run.replay());
-    bubble.append(pic('speaker'));
-    const show = h('div', 'show');
-    const choices = h('div', `choices ${gameKey}`);
-    root.append(pic('elephant', 'guide'), pic(requester, 'requester'), bubble, show, choices);
+  render(root, app, { village = 'savanna', game: key }) {
+    const game = findGame(village, key);
+    const play = h('div', { class: 'play' });
+    const bubble = createBubble(app);
+    const guide = createGuide();
+    root.append(play, bubble.el, guide.el);
 
-    let doneTimer = null;
     const fx = {
       say: app.say,
+      bubble: bubble.set,
       sfx: app.sfx,
-      cheer: () => root.classList.add('cheer'),
-      bubble: (text, speak) => {
-        bubble.setAttribute('aria-label', text);
-        bubble.classList.remove('talk');
-        void bubble.offsetWidth; // 말할 때마다 말풍선이 다시 통통 튀게
-        bubble.classList.add('talk');
-        if (speak) app.say(text);
+      cheer: () => {
+        cheer(root.closest('.stage'));
+        guide.hop();
       },
     };
 
     const run = createGameRun({
-      levels: LEVELS,
+      levels: game.levels,
       fx,
-      ask({ range, last }) {
-        root.classList.remove('cheer');
-        const q = makeQuestion(gameKey, { range, last });
-        const { hintTarget } = renderQuestion(gameKey, q, {
-          show,
-          choices,
-          choose: (c) => run.answer(c.right),
-          // 세어 주기: 하나 담을 때마다 같이 센다 ("하나, 둘, 셋…")
-          fill: (count) => {
-            app.say(NATIVE[count]);
-            if (count === q.n) doneTimer = setTimeout(() => run.answer(true), COUNT_DONE_MS);
-          },
-        });
-        const hint = async () => {
-          hintTarget.classList.add('hint');
-          app.say(hintFor(gameKey));
-          await wait(HINT_MS);
-        };
-        return { n: q.n, prompt: q.prompt, hint };
+      ask: (info) => {
+        const question = game.ask(play, { run, say: app.say, bubble: bubble.set, sfx: app.sfx }, info);
+        if (EXPOSE_ANSWER) play.dataset.answer = String(question.answer ?? question.n);
+        return question;
       },
       onProgress: (done, total) => app.bar.setDots(done, total),
-      onFinish: () => app.finishGame(villageKey, gameKey),
+      // 놀이 시간이 다 되면 하던 문제까지 끝내고 잠근다 (풀면 마을로)
       shouldPause: app.isTimeOver,
-      onPause: () => app.lock(),
+      onPause: () => app.lock({ name: 'village', params: { village } }),
+      onFinish: () => {
+        const reward = finishGame(app.progress, findVillage(village).detail, key);
+        app.update(() => reward.progress);
+        const { sticker, isNew, opened, special } = reward;
+        app.go('reward', { village, sticker, isNew, opened, special });
+      },
     });
+    currentRun = run;
+    currentStage = root.closest('.stage');
 
-    root.addEventListener('pointerdown', run.poke);
-    this.stop = () => {
-      clearTimeout(doneTimer);
-      run.stop();
+    const replay = () => {
+      run.poke();
+      run.replay();
     };
+    bubble.el.addEventListener('click', replay);
+    guide.el.addEventListener('click', replay);
+    app.bar.setDots(0, run.state.total);
+    app.bar.setBack(() => app.go('village', { village }), '마을로 돌아가기');
     run.start();
   },
+
   leave() {
-    this.stop?.();
+    currentRun?.stop();
+    currentRun = null;
+    stopVoice(); // 문제 안내·칭찬이 다음 화면까지 이어지지 않게
+    currentStage?.querySelectorAll('.cheer').forEach((el) => el.remove());
+    currentStage = null;
   },
 };

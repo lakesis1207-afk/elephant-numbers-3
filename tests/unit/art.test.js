@@ -1,35 +1,27 @@
+import { describe, test, expect } from 'vitest';
 import { existsSync } from 'node:fs';
-import { describe, expect, it } from 'vitest';
-import { allArtPaths, artUrl } from '../../src/art.js';
-import { VILLAGES, ALL_GAMES } from '../../src/games/villages.js';
-import { GAME_KEYS, LEVELS, makeQuestion } from '../../src/games/questions.js';
+import { fileURLToPath } from 'node:url';
+import { allArtUrls } from '../../src/art/registry.js';
+import { VILLAGES } from '../../src/villages/index.js';
 
-const IMAGES = new URL('../../public/images/', import.meta.url);
+const PUBLIC = fileURLToPath(new URL('../../public/', import.meta.url));
+const fileOf = (url) => PUBLIC + url.replace(/^\//, '');
 
-describe('그림', () => {
-  it('목록의 모든 그림 파일이 있다', () => {
-    for (const p of allArtPaths()) expect(existsSync(new URL(p, IMAGES)), p).toBe(true);
+describe('그림 파일', () => {
+  test('그림 목록의 파일이 모두 있다', () => {
+    const missing = allArtUrls().filter((url) => !existsSync(fileOf(url)));
+    expect(missing).toEqual([]);
   });
 
-  it('마을·게임·스티커가 쓰는 그림이 모두 목록에 있다', () => {
-    for (const v of VILLAGES) [v.background, ...v.animals].forEach((n) => expect(() => artUrl(n)).not.toThrow());
-    for (const g of ALL_GAMES) [g.icon, g.sticker].forEach((n) => expect(() => artUrl(n)).not.toThrow());
-    expect(new Set(ALL_GAMES.map((g) => g.sticker)).size).toBe(9);
+  test('잠금 화면 밤 배경은 webp 그림이다', () => {
+    expect(allArtUrls().some((u) => u.endsWith('/backgrounds/night-base.webp'))).toBe(true);
   });
 
-  it('문제가 쓰는 그림이 모두 목록에 있다', () => {
-    for (const key of GAME_KEYS) {
-      for (const range of LEVELS) {
-        for (let i = 0; i < 50; i++) {
-          const q = makeQuestion(key, { range });
-          const names = [q.fruit, q.target, ...(q.sequence ?? []), ...q.choices.map((c) => c.art)].filter(Boolean);
-          names.forEach((n) => expect(() => artUrl(n), `${key}: ${n}`).not.toThrow());
-        }
-      }
-    }
-  });
-
-  it('없는 그림 이름은 오류를 낸다', () => {
-    expect(() => artUrl('없는그림')).toThrow();
+  test('마을 동물·게임 카드 그림이 모두 목록에 있다', () => {
+    const urls = allArtUrls();
+    VILLAGES.forEach((v) => {
+      v.detail.animals.forEach((a) => expect(urls.some((u) => u.includes(`/characters/${a.key}.`)), a.key).toBe(true));
+      v.detail.games.forEach((g) => g.scene.forEach((s) => expect(urls.some((u) => u.includes(`/${s.name}.`)), s.name).toBe(true)));
+    });
   });
 });

@@ -1,6 +1,6 @@
 // 하루 놀이 시간: 계산(화면과 상관없음) + 1초마다 재는 시계.
-// 시간이 다 되면 잠금 화면으로 가고, 부모님이 2초 눌러 풀 수 있다.
-import { pickOne } from '../games/logic.js';
+// 시간이 다 되면 잠금 화면으로 가고, 부모님이 1초 눌러 풀 수 있다.
+import { pickOne } from '@공통/games/logic.js';
 
 export const MINUTE = 60_000;
 export const WARN_BEFORE_MS = MINUTE; // 끝나기 1분 전에 알림
@@ -45,8 +45,16 @@ export const unlockChange = (p) => moreTimeChange(p, p.limitMin);
 /** 부모 메뉴 "1분 (시험용)" */
 export const testLimitChange = () => ({ limitMin: 1, usedMs: 0, bonusMs: 0 });
 
-/** 기록 지우기: 스티커와 끝낸 게임을 지우고 놀이 시간 제한은 10분으로 되돌린다. */
-export const resetChange = () => ({ stickers: [], done: {}, limitMin: 10 });
+/** 기록 지우기: 스티커·별·마을 열림만 처음으로. 시간과 설정(음악, 제한)은 그대로. */
+export const resetChange = () => ({
+  stickers: [],
+  done: {},
+  special: false,
+  specialSeen: false,
+  forestOpen: false,
+  seaOpen: false,
+  allOpen: false,
+});
 
 /**
  * 1초마다 시간을 잰다.

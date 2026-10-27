@@ -1,0 +1,380 @@
+/* 화면별 모양 (시제품 26~70, 145~148, 171줄을 옮김). 크기는 무대 높이 기준(cqh). */
+
+button {
+  font-family: inherit;
+  color: inherit;
+  cursor: pointer;
+  border: 0;
+  background: none;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+button:focus-visible {
+  outline: 0.6cqh solid var(--coral);
+  outline-offset: 0.4cqh;
+}
+img {
+  max-width: 100%;
+  -webkit-user-drag: none;
+  pointer-events: none;
+}
+.ico {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+.press:active {
+  transform: translateY(0.6cqh) scale(0.97);
+}
+
+/* 배경 */
+.bg {
+  position: absolute;
+  inset: 0;
+}
+.bg img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* 화면 공통 */
+.screen {
+  padding: 13cqh 4cqh 4cqh;
+  box-sizing: border-box;
+  justify-content: flex-start;
+  gap: 0;
+}
+
+/* 위쪽 막대 */
+.bar {
+  position: absolute;
+  inset: 0 0 auto;
+  height: 11cqh;
+  display: flex;
+  align-items: center;
+  gap: 2cqh;
+  padding: 0 3cqh;
+  z-index: 5;
+}
+.bar[hidden] {
+  display: none;
+}
+.bar .spacer {
+  flex: 1;
+}
+/* 자물쇠(부모)·홈 버튼: 아이 손가락에 맞게 크게. 둘레에 눈에 안 보이는 누르는 자리를 조금 더 둔다. */
+.pbtn,
+.backbtn {
+  position: relative;
+}
+.pbtn::after,
+.backbtn::after {
+  content: '';
+  position: absolute;
+  inset: -1cqh;
+}
+/* 막대는 커진 버튼만큼 높지만, 빈 곳은 아래 게임판을 누를 수 있게 통과시킨다 */
+.bar {
+  height: 20cqh;
+  align-items: flex-start;
+  padding-top: 1cqh;
+  box-sizing: border-box;
+  pointer-events: none;
+}
+.bar > * {
+  pointer-events: auto;
+}
+/* 설정 버튼을 톡 누르면 바로 오른쪽에 뜨는 안내 말풍선 */
+.ptip {
+  position: absolute;
+  left: 23cqh;
+  top: 5.5cqh;
+  padding: 1.6cqh 2.4cqh;
+  border-radius: 2.4cqh;
+  background: var(--card);
+  border: 0.45cqh solid var(--ink);
+  font-size: 3.6cqh;
+  white-space: nowrap;
+  color: var(--ink);
+  pointer-events: none;
+  z-index: 6;
+  animation: ptip-in 0.2s ease-out;
+}
+.ptip[hidden] {
+  display: none;
+}
+/* 말풍선 꼬리: 설정 버튼 쪽(왼쪽)을 가리킨다 */
+.ptip::before {
+  content: '';
+  position: absolute;
+  left: -1.6cqh;
+  top: 50%;
+  width: 2.4cqh;
+  height: 2.4cqh;
+  background: var(--card);
+  border-left: 0.45cqh solid var(--ink);
+  border-bottom: 0.45cqh solid var(--ink);
+  transform: translateY(-50%) rotate(45deg);
+}
+@keyframes ptip-in {
+  from {
+    opacity: 0;
+    transform: translateX(-1.5cqh);
+  }
+}
+.pbtn {
+  width: 18cqh;
+  height: 18cqh;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.6);
+  padding: 0.6cqh;
+  box-sizing: border-box;
+}
+.bookbtn {
+  position: relative;
+  width: 10cqh;
+  height: 10cqh;
+}
+.bookbtn[hidden] {
+  display: none;
+}
+.bookbtn b {
+  position: absolute;
+  right: -0.6cqh;
+  bottom: 0;
+  min-width: 4.4cqh;
+  height: 4.4cqh;
+  border-radius: 2.2cqh;
+  background: var(--coral);
+  color: #fff;
+  font-weight: 400;
+  font-size: 3cqh;
+  display: grid;
+  place-items: center;
+  border: 0.4cqh solid var(--ink);
+  box-sizing: border-box;
+  padding: 0 0.8cqh;
+}
+
+/* 동그란 그림 버튼 */
+.rbtn {
+  width: 17cqh;
+  height: 17cqh;
+  filter: drop-shadow(0 0.9cqh 0 rgba(58, 42, 28, 0.25));
+}
+
+/* 시작 */
+.screen.start {
+  justify-content: center;
+  gap: 2cqh;
+  padding-top: 4cqh;
+}
+.start .hero {
+  height: 46cqh;
+  animation: bob 2.4s ease-in-out infinite;
+}
+.start h1 {
+  font-weight: 400;
+  font-size: 6.4cqh;
+  margin: 0;
+  color: #fff;
+  text-shadow: 0.35cqh 0.35cqh 0 var(--ink), -0.35cqh 0.35cqh 0 var(--ink), 0.35cqh -0.35cqh 0 var(--ink),
+    -0.35cqh -0.35cqh 0 var(--ink), 0 0.8cqh 0 var(--ink);
+}
+@keyframes bob {
+  50% {
+    transform: translateY(-2cqh);
+  }
+}
+
+/* 지도 + 마을 */
+.screen.map,
+.screen.village {
+  justify-content: center;
+}
+.path {
+  display: flex;
+  gap: 2.4cqh;
+  align-items: flex-end;
+  justify-content: center;
+  width: 100%;
+}
+.vcard {
+  width: 30cqh;
+  height: 41cqh;
+  border-radius: 4cqh;
+  background: var(--card);
+  border: 0.5cqh solid var(--ink);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1cqh;
+  box-shadow: 0 1cqh 0 rgba(58, 42, 28, 0.25);
+  font-size: 3.2cqh;
+  color: var(--soft);
+  position: relative;
+  box-sizing: border-box;
+  white-space: nowrap;
+}
+.vcard:nth-child(even) {
+  transform: translateY(-3cqh);
+}
+.vcard img {
+  height: 23cqh;
+}
+.vcard img.round {
+  width: 23cqh;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 0.5cqh solid var(--ink);
+  box-sizing: border-box;
+}
+/* 그림 칸: 둥근 네모 안에 마을 배경, 그 위에 동물 */
+.vcard .vpic {
+  position: relative;
+  width: 25cqh;
+  height: 25cqh;
+  border-radius: 3cqh;
+  border: 0.4cqh solid var(--ink);
+  overflow: hidden;
+  box-sizing: border-box;
+  display: grid;
+  place-items: end center;
+}
+.vcard .vpic img.vbg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  object-fit: cover;
+}
+.vcard .vpic img:not(.vbg) {
+  position: relative;
+  height: 20cqh;
+  margin-bottom: 1cqh;
+}
+.vcard.locked img {
+  filter: grayscale(1) brightness(1.1);
+  opacity: 0.5;
+}
+.vcard .lk {
+  position: absolute;
+  inset: auto auto 17cqh; /* 그림 칸 가운데 (마을 이름과 겹치지 않게) */
+  width: 11cqh;
+  height: 11cqh;
+}
+.vcard .lk img {
+  filter: none;
+  opacity: 1;
+  height: 100%;
+}
+.games {
+  display: flex;
+  gap: 4cqh;
+  margin-top: 2cqh;
+}
+.gcard {
+  width: 38cqh;
+  height: 46cqh;
+  border-radius: 4.5cqh;
+  background: var(--card);
+  border: 0.5cqh solid var(--ink);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 1cqh 0 rgba(58, 42, 28, 0.25);
+  position: relative;
+  box-sizing: border-box;
+  font-size: 2.8cqh;
+  color: var(--soft);
+}
+.gcard .scene {
+  position: relative;
+  width: 32cqh;
+  height: 32cqh;
+}
+.gcard .scene img {
+  position: absolute;
+  max-width: none;
+}.gcard .star {
+  position: absolute;
+  top: 1.6cqh;
+  right: 1.8cqh;
+  width: 7cqh;
+  height: 7cqh;
+}
+.story {
+  display: flex;
+  align-items: center;
+  gap: 1.6cqh;
+  background: var(--card);
+  border: 0.5cqh solid var(--ink);
+  border-radius: 4cqh;
+  padding: 1.2cqh 3cqh;
+  font-size: 3.4cqh;
+  box-sizing: border-box;
+}
+.story .cake {
+  width: 7cqh;
+  height: 7cqh;
+}
+
+/* 준비 중인 마을 */
+.screen.soon {
+  justify-content: center;
+  gap: 3cqh;
+}
+.soon > img {
+  height: 34cqh;
+}
+.soon > img.round {
+  width: 34cqh;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 0.6cqh solid var(--ink);
+}
+
+/* 부모님용 글자 안내 */
+.toast {
+  position: absolute;
+  left: 50%;
+  bottom: 6cqh;
+  transform: translateX(-50%);
+  background: var(--ink);
+  color: #fff;
+  font-size: 3.2cqh;
+  padding: 1.4cqh 3.6cqh;
+  border-radius: 3cqh;
+  z-index: 40;
+}
+.toast[hidden] {
+  display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+/* 마을 이름(지도 카드)과 게임 이름(게임 카드): 동글동글한 굵은 글씨(Dongle). 앱 안에 들어 있어 오프라인에서도 보인다.
+   Dongle은 같은 크기에서 작아 보여서 다른 글씨보다 크게 쓴다. */
+.vcard > span:last-child,
+.gcard > span:last-child {
+  font-family: 'Dongle', var(--font);
+  font-weight: 700;
+  line-height: 0.9;
+  color: var(--ink);
+}
+.vcard > span:last-child {
+  font-size: 6.4cqh;
+}
+.gcard > span:last-child {
+  font-size: 5.6cqh;
+}

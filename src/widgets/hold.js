@@ -1,6 +1,6 @@
 // 꾹 누르기: ms 동안 누르고 있어야 done이 불린다 (부모님 전용 버튼). 누르는 동안 'holding' 클래스.
 // 손을 떼거나 버튼 밖으로 나가면 취소된다. 키보드(Enter/Space)도 같다.
-export const PARENT_HOLD_MS = 2000;
+export const PARENT_HOLD_MS = 1000;
 // 꾹 누르기가 끝난 뒤 따라오는 click을 무시하는 시간. 지나면 표시를 지운다
 // (손을 뗀 곳이 버튼 밖이라 click이 안 오면 표시가 남아 다음 톡 누르기를 막기 때문).
 const HELD_FLAG_MS = 800;

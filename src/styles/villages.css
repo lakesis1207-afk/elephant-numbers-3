@@ -1,0 +1,894 @@
+/* 숲속·바닷가·공룡·농장 마을 게임 화면. 게임판은 가로 약 126cqh × 세로 약 83cqh 안에 들어간다. */
+
+/* 공통: 하나씩 세는 물건의 번호표, 반짝 */
+.num {
+  position: absolute;
+  right: -0.6cqh;
+  top: -0.6cqh;
+  min-width: 4.6cqh;
+  height: 4.6cqh;
+  padding: 0 0.8cqh;
+  border-radius: 2.3cqh;
+  background: var(--leaf);
+  border: 0.4cqh solid var(--ink);
+  color: #fff;
+  font-size: 2.8cqh;
+  display: grid;
+  place-items: center;
+  box-sizing: border-box;
+  z-index: 2;
+}
+.balloon.hl,
+.loose.hl,
+.tenbox.hl,
+.step.hl,
+.asitem.hl,
+.corn.hl {
+  filter: drop-shadow(0 0 1.2cqh #ffe07a) drop-shadow(0 0 0.6cqh #ffe07a);
+}
+.opt.pict {
+  width: 24cqh;
+  height: 24cqh;
+  padding: 2cqh;
+  justify-content: center;
+}
+.opt.pict img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+/* 세기 게임 공통 (도토리·물고기·조개): 쟁반 + 숫자 보기 */
+.countq {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 2cqh;
+}
+.countq .tray {
+  gap: 2cqh 3cqh;
+  background: #fff6e6;
+}
+.tray.forest {
+  background: radial-gradient(circle at 30% 30%, #e9f6d7, #cfe8b4);
+}
+.tray.sea {
+  background: radial-gradient(circle at 30% 30%, #e3f6fd, #b9e3f4);
+}
+.tray.boxes {
+  gap: 1.6cqh 2cqh;
+}
+.tenbox {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 0.6cqh;
+  padding: 1.2cqh;
+  border-radius: 2cqh;
+  background: #c98d4e;
+  border: 0.5cqh solid var(--ink);
+  box-shadow: 0 0.8cqh 0 rgba(58, 42, 28, 0.25);
+  width: 34cqh;
+  box-sizing: border-box;
+}
+.tenbox img {
+  width: 100%;
+  aspect-ratio: 1;
+}
+.tenbox.net {
+  background: repeating-linear-gradient(45deg, #f6fbff 0 1.2cqh, #d4ecf7 1.2cqh 1.6cqh);
+  width: 30cqh;
+}
+.tenbox.shellbox {
+  width: 25cqh;
+  padding: 1cqh;
+  gap: 0.4cqh;
+  background: #ffe2c6;
+}
+.tenbox.c {
+  transform: scale(0.96);
+}
+/* 크게 보여 주기: 도토리 세기(숲속) — 상자 48cqh + 낱개 4개씩 최대 3줄 */
+.tray.forest .tenbox {
+  width: 53cqh; /* 안의 도토리 ≈ 물고기 그물 속 물고기 크기 */
+  align-self: center; /* 낱개 줄이 길어도 상자가 세로로 늘어나지 않게 */
+}
+.tray.forest .loosegroup {
+  gap: 1.2cqh;
+  max-width: 65cqh;
+}
+.tray.forest .loose {
+  width: 10.5cqh; /* 낱개는 묶음 속과 비슷하게 (물고기 묶기와 같은 크기) */
+  height: 10.5cqh;
+}
+/* 물고기 묶기 — 그물은 세로로 쌓고(최대 3개), 낱개는 4마리씩 */
+/* 물고기 그물: 세로로 선 그물(2줄 × 5칸)을 옆으로 나란히 둬서, 세 개여도 숫자 버튼을 가리지 않고 물고기를 크게 */
+.tray.sea .netgroup {
+  flex-direction: row;
+  flex-wrap: nowrap;
+  max-width: none;
+  gap: 2cqh;
+}
+.tray.sea .tenbox.net {
+  width: 23cqh;
+  grid-template-columns: repeat(2, 1fr);
+}
+.tray.sea .loosegroup {
+  gap: 1.2cqh;
+  max-width: 35cqh;
+}
+.tray.sea .loose {
+  width: 10.5cqh; /* 도토리 세기 낱개와 같은 크기 */
+  height: 10.5cqh;
+}
+/* 열씩 세기 — 상자 6개까지는 1.5배, 7개 이상이면 화면에 들어가게 조금만 */
+.tray.boxes .tenbox.shellbox {
+  width: 44cqh;
+}
+.tray.boxes:has(> .shellbox:nth-child(7)) .tenbox.shellbox {
+  width: 33cqh;
+}
+.netgroup,
+.loosegroup {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.6cqh;
+  align-items: center;
+  justify-content: center;
+  max-width: 64cqh;
+}
+.loose {
+  position: relative;
+  width: 10.5cqh;
+  height: 10.5cqh;
+  transition: transform 0.15s;
+}
+.loose img {
+  width: 100%;
+  height: 100%;
+}
+.loose.c {
+  transform: scale(0.92);
+}
+.loose.hl,
+.tenbox.hl {
+  transform: scale(1.12);
+}
+
+/* 풍선 터뜨리기 */
+.balloonq {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+}
+.balloon {
+  position: relative;
+  width: 24cqh;
+  height: 34cqh;
+  /* 버튼째 천천히 떠다닌다 (누르는 자리도 함께 움직여서 그림과 어긋나지 않는다) */
+  animation: balloon-drift 6s ease-in-out infinite;
+  animation-delay: calc(var(--i) * -1.3s);
+}
+@keyframes balloon-drift {
+  25% {
+    translate: 4cqh -4cqh;
+  }
+  50% {
+    translate: 0 -7cqh;
+  }
+  75% {
+    translate: -4cqh -3cqh;
+  }
+}
+.bfloat {
+  position: absolute;
+  inset: 0;
+  animation: balloon-float 3s ease-in-out infinite;
+  animation-delay: calc(var(--i) * -0.6s);
+}
+.balloon:nth-child(even) {
+  margin-top: 18cqh;
+}
+.balloon img {
+  width: 100%;
+  height: 100%;
+}
+.balloon b {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 8.5cqh;
+  font-weight: 400;
+  font-size: 11cqh;
+  line-height: 1;
+  color: #fff;
+  -webkit-text-stroke: 0.5cqh var(--ink);
+  paint-order: stroke fill;
+}
+@keyframes balloon-float {
+  50% {
+    transform: translateY(-2cqh);
+  }
+}
+/* 정답 풍선: 0.6초 동안 흔들리며 올라가다가(balloon.js POP_AT_MS) 펑! 터진다 */
+.balloon.right {
+  z-index: 3;
+}
+.balloon.right .bfloat {
+  animation: balloon-rise 0.6s ease-in forwards;
+}
+.balloon.right .bfloat > img,
+.balloon.right .bfloat > b {
+  animation: balloon-burst 0.25s ease-out 0.6s forwards;
+}
+.bpop {
+  position: absolute;
+  left: 50%;
+  top: 38%;
+  pointer-events: none;
+}
+.bpop i {
+  position: absolute;
+  width: 2.8cqh;
+  height: 2.8cqh;
+  margin: -1.4cqh;
+  border-radius: 50%;
+  background: var(--c);
+  border: 0.3cqh solid var(--ink);
+  opacity: 0;
+  animation: bpop-piece 0.5s ease-out 0.6s forwards;
+}
+.bpop em {
+  position: absolute;
+  translate: -50% -50%;
+  font-style: normal;
+  font-size: 8cqh;
+  line-height: 1;
+  white-space: nowrap;
+  color: #fff;
+  -webkit-text-stroke: 0.5cqh var(--ink);
+  paint-order: stroke fill;
+  opacity: 0;
+  animation: bpop-text 0.7s ease-out 0.6s forwards;
+}
+@keyframes balloon-rise {
+  30% {
+    transform: translateY(-6cqh) rotate(-6deg);
+  }
+  65% {
+    transform: translateY(-14cqh) rotate(6deg);
+  }
+  100% {
+    transform: translateY(-20cqh) rotate(0);
+  }
+}
+@keyframes balloon-burst {
+  40% {
+    transform: scale(1.35);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1.6);
+    opacity: 0;
+  }
+}
+@keyframes bpop-piece {
+  0% {
+    opacity: 1;
+    transform: rotate(var(--a)) translateY(0) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: rotate(var(--a)) translateY(-13cqh) scale(0.6);
+  }
+}
+@keyframes bpop-text {
+  0% {
+    opacity: 0;
+    scale: 0.5;
+  }
+  30% {
+    opacity: 1;
+    scale: 1.2;
+  }
+  100% {
+    opacity: 0;
+    scale: 1;
+  }
+}
+
+/* 많다/적다: 두 줄 */
+.compareq {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 2cqh;
+  padding-right: 11cqh; /* 오른쪽 아래 뒤로가기 버튼 자리 */
+  box-sizing: border-box;
+}
+.crow {
+  display: flex;
+  align-items: center;
+  gap: 2cqh;
+  min-height: 30cqh;
+  padding: 2cqh 3cqh;
+  border-radius: 4cqh;
+  background: rgba(255, 252, 244, 0.88);
+  border: 0.5cqh solid var(--ink);
+  box-shadow: 0 0.9cqh 0 rgba(58, 42, 28, 0.25);
+  box-sizing: border-box;
+}
+.crow.right {
+  background: #c9f2c4;
+}
+.cicon {
+  height: 24cqh;
+  flex: none;
+}
+/* 크게(약 2배) 보여 주려고 5개씩 두 줄로 놓는다 (최대 10개) */
+.citems {
+  display: grid;
+  grid-template-columns: repeat(5, 18cqh);
+  gap: 0.8cqh;
+}
+.citem {
+  height: 18cqh;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  transition: background 0.2s;
+}
+.citem img {
+  width: 100%;
+  height: 18cqh; /* .citem 높이와 같게. 100%는 격자 칸 안에서 계산되지 않아 직접 쓴다 */
+  object-fit: contain; /* 세로로 긴 그림(병아리)도 칸 밖으로 나가지 않게 */
+}
+.citem.pair {
+  background: rgba(63, 174, 94, 0.28);
+}
+.citem.extra {
+  background: rgba(255, 200, 58, 0.6);
+  filter: drop-shadow(0 0 1cqh #ffe07a);
+}
+
+/* 무늬 잇기 */
+.patternq {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+}
+.pseq {
+  display: flex;
+  justify-content: center;
+  gap: 1.2cqh;
+  padding: 2.4cqh;
+  border-radius: 4cqh;
+  background: rgba(255, 252, 244, 0.88);
+  border: 0.5cqh solid var(--ink);
+}
+.pcell {
+  width: 16cqh;
+  height: 16cqh;
+  display: grid;
+  place-items: center;
+  border-radius: 2cqh;
+  transition: transform 0.2s;
+}
+.pcell img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+.pcell.hl {
+  background: rgba(255, 200, 58, 0.5);
+  transform: translateY(-1cqh);
+}
+.pcell.blank {
+  border: 0.5cqh dashed var(--ink);
+  box-sizing: border-box;
+}
+.pcell.blank b {
+  font-weight: 400;
+  font-size: 10cqh;
+  color: var(--coral);
+}
+
+/* 숫자판 찾기 */
+.boardq {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2.5cqh;
+}
+.btarget {
+  flex: none;
+  width: 21cqh;
+  padding: 2cqh 0;
+  border-radius: 3cqh;
+  background: var(--card);
+  border: 0.6cqh solid var(--ink);
+  font-size: 13cqh;
+  line-height: 1;
+  text-align: center;
+  color: var(--coral);
+  -webkit-text-stroke: 0.3cqh var(--ink);
+}
+.board {
+  display: grid;
+  grid-template-columns: repeat(10, 9.2cqh);
+  gap: 0.6cqh;
+  padding: 1.6cqh;
+  border-radius: 3cqh;
+  background: rgba(255, 252, 244, 0.9);
+  border: 0.5cqh solid var(--ink);
+}
+/* 칸 수에 따라 게임판(세로 약 83cqh)에 들어가는 만큼 크게: 30칸 → 50칸 → 100칸 */
+.bcell {
+  height: 16cqh;
+  border-radius: 1.4cqh;
+  background: #fff;
+  border: 0.35cqh solid #d8c8a8;
+  font-size: 7cqh;
+  color: var(--ink);
+}
+.board.rows10 .bcell {
+  height: 7.2cqh;
+  font-size: 4.8cqh;
+}
+.board.rows5 .bcell {
+  height: 11cqh; /* 오른쪽 아래 뒤로가기 버튼과 겹치지 않게 */
+  font-size: 6.4cqh;
+}
+.bcell:nth-child(10n + 1) {
+  border-color: var(--leaf);
+}
+.bcell.hl {
+  background: #fff1c2;
+  border-color: var(--sun);
+  filter: none;
+}
+.bcell.right {
+  background: #c9f2c4;
+  border-color: var(--leaf);
+}
+
+/* 발자국 빈칸 */
+.stepsq {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+}
+/* 발자국: 왼쪽에서 오른쪽으로 걸어가는 모양. 발끝이 오른쪽을 보고, 왼발·오른발이 위아래로 번갈아 찍힌다 */
+.steprow {
+  display: flex;
+  justify-content: center;
+  gap: 1cqh;
+}
+.step {
+  display: block;
+  position: relative;
+  width: 24cqh;
+  height: 30cqh;
+  transform: translateY(-6cqh);
+}
+.step:nth-child(even) {
+  transform: translateY(6cqh);
+}
+.step img {
+  width: 100%;
+  height: 100%;
+  transform: rotate(90deg) scale(0.9);
+}
+.step:nth-child(even) img {
+  transform: rotate(90deg) scale(0.9) scaleX(-1); /* 반대쪽 발 */
+}
+.step b {
+  position: absolute;
+  inset: 11cqh 0 auto;
+  text-align: center;
+  line-height: 1;
+  font-weight: 400;
+  font-size: 9cqh;
+  color: #fff;
+  -webkit-text-stroke: 0.45cqh var(--ink);
+  paint-order: stroke fill;
+}
+.step.blank b {
+  color: var(--sun);
+}
+
+/* 더하기·빼기 (알·달걀) */
+.asq {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 2cqh;
+}
+.asbox {
+  position: relative;
+  flex: 1;
+  border-radius: 4cqh;
+  background: rgba(255, 252, 244, 0.88);
+  border: 0.5cqh solid var(--ink);
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+}
+.ascont {
+  position: absolute;
+  left: 50%;
+  bottom: -2cqh;
+  width: 70%;
+  translate: -50% 0;
+  opacity: 0.9;
+}
+.asitems {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 2cqh 3cqh;
+  max-width: 116cqh;
+}
+.asgroup {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1cqh;
+  max-width: 74cqh;
+  justify-content: center;
+}
+/* 알·달걀은 바구니(둥지) 몸통 안에 5개씩 두 줄로 담는다. 묶음 칸은 없애고 한 줄로 이어 놓는다 */
+.asbox.in-basket .ascont,
+.asbox.in-nest .ascont {
+  width: 84cqh;
+  bottom: 1cqh;
+}
+.asbox.in-basket .asitems,
+.asbox.in-nest .asitems {
+  position: absolute;
+  left: 50%;
+  translate: -50% 0;
+  width: 56cqh;
+  max-width: none;
+  gap: 1cqh 1.2cqh;
+  align-content: flex-end;
+}
+.asbox.in-basket .asitems {
+  bottom: 8cqh;
+  height: 26cqh;
+}
+.asbox.in-nest .asitems {
+  bottom: 9cqh;
+  height: 26cqh;
+}
+.asbox.in-basket .asgroup,
+.asbox.in-nest .asgroup {
+  display: contents;
+}
+.asbox.in-basket .asitem,
+.asbox.in-nest .asitem {
+  width: 10cqh;
+  height: 12cqh;
+}
+.asop {
+  font-weight: 400;
+  font-size: 9cqh;
+  color: var(--coral);
+}
+.asitem {
+  position: relative;
+  width: 14cqh;
+  height: 16.8cqh;
+  transition: transform 0.15s;
+}
+.asitem img {
+  width: 100%;
+  height: 100%;
+}
+.asitem.new {
+  filter: drop-shadow(0 0 1cqh #ffe07a);
+}
+/* 더하기: 새로 온 것은 처음엔 없다가(누를 수도 없다) 톡 나타난다 */
+.asitem.wait {
+  visibility: hidden;
+  pointer-events: none;
+}
+.asitem.appear {
+  animation: as-appear 0.6s cubic-bezier(0.3, 1.6, 0.5, 1);
+}
+@keyframes as-appear {
+  0% {
+    opacity: 0;
+    transform: translateY(-6cqh) scale(0.3);
+  }
+}
+.asitem.gone {
+  opacity: 0.25;
+  filter: grayscale(1);
+  outline: 0.4cqh dashed var(--soft);
+  border-radius: 50%;
+}
+/* 빼기: 처음엔 진짜로 있다가(addsub.js TAKE_AT_MS 뒤) 위로 떠오르며 사라지고 흐린 자리만 남는다 */
+.asitem.gone.taken {
+  animation: as-taken 0.9s ease-in-out;
+}
+@keyframes as-taken {
+  0% {
+    opacity: 1;
+    filter: none;
+    outline-color: transparent;
+    transform: none;
+  }
+  55% {
+    opacity: 0;
+    filter: none;
+    outline-color: transparent;
+    transform: translateY(-8cqh) scale(0.8);
+  }
+  56% {
+    transform: none;
+  }
+  100% {
+    opacity: 0.25;
+  }
+}
+.asitem.c {
+  transform: scale(0.92);
+}
+.asitem.hl {
+  transform: scale(1.15);
+}
+
+/* 반짝 몇 개? (옥수수 접시) */
+.feedq {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-around;
+}
+.plate {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(5, 14cqh);
+  gap: 1.4cqh;
+  padding: 3cqh 4cqh;
+  border-radius: 50% / 40%;
+  background: #fff;
+  border: 0.7cqh solid var(--ink);
+  box-shadow: 0 1cqh 0 rgba(58, 42, 28, 0.25), inset 0 0 0 1.6cqh #f4e7cf;
+}
+.fcell {
+  height: 16cqh;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: radial-gradient(circle, #f4e7cf 0 45%, transparent 46%);
+}
+.corn {
+  height: 100%;
+  transition: transform 0.2s;
+}
+.corn.hl {
+  transform: scale(1.25);
+}
+.cloth {
+  position: absolute;
+  inset: -1.8cqh;
+  border-radius: 4cqh;
+  border: 0.6cqh solid var(--ink);
+  background: repeating-linear-gradient(0deg, rgba(255, 110, 90, 0.5) 0 3cqh, transparent 3cqh 6cqh),
+    repeating-linear-gradient(90deg, rgba(255, 110, 90, 0.5) 0 3cqh, transparent 3cqh 6cqh), #fff6e6;
+  animation: wiggle 2.4s ease-in-out infinite;
+}
+.cloth[hidden] {
+  display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .balloon,
+  .bfloat,
+  .balloon.right .bfloat,
+  .balloon.right .bfloat > img,
+  .balloon.right .bfloat > b,
+  .asitem.gone.taken,
+  .cloth {
+    animation: none;
+  }
+  .bpop {
+    display: none;
+  }
+}
+
+/* 숫자 찾기 (농장): 큰 숫자 + 그 숫자가 있는 줄 고르기 */
+.rowfindq {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 5cqh;
+}
+.rftarget {
+  min-width: 34cqh;
+  padding: 2cqh 5cqh;
+  box-sizing: border-box;
+  border-radius: 4cqh;
+  background: var(--card);
+  border: 0.6cqh solid var(--ink);
+  box-shadow: 0 1cqh 0 rgba(58, 42, 28, 0.25);
+  font-size: 18cqh;
+  line-height: 1;
+  text-align: center;
+  color: var(--coral);
+  -webkit-text-stroke: 0.4cqh var(--ink);
+}
+.rowbtns {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 2.4cqh;
+  max-width: 120cqh;
+}
+.rowbtn {
+  width: 34cqh;
+  height: 15cqh;
+  border-radius: 3cqh;
+  background: var(--card);
+  border: 0.5cqh solid var(--ink);
+  box-shadow: 0 0.8cqh 0 rgba(58, 42, 28, 0.25);
+  font-size: 7.5cqh;
+  color: var(--ink);
+}
+.rowbtns.rows5 .rowbtn {
+  width: 22cqh;
+  font-size: 5.2cqh;
+}
+.rowbtn.hl {
+  background: #fff1c2;
+  border-color: var(--sun);
+  transform: scale(1.06);
+}
+.rowbtn.right {
+  background: #c9f2c4;
+  border-color: var(--leaf);
+}
+
+/* 풍선 불기: 가운데 풍선이 누를 때마다 커지고(--s, 처음의 1~2.5배), 아래에 숫자와 칸이 있다 */
+.blowq {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.blowstage {
+  flex: 1;
+  width: 100%;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding-bottom: 1cqh;
+}
+.balloon.blow {
+  width: 13cqh;
+  height: 18cqh;
+  animation: none; /* 커지는 풍선은 떠다니지 않게 (누르기 쉽게) */
+  scale: var(--s);
+  transform-origin: 50% 100%;
+  transition: scale 0.18s ease-out;
+}
+.balloon.blow.puff .bfloat {
+  animation: blow-puff 0.25s ease-out;
+}
+@keyframes blow-puff {
+  40% {
+    transform: scale(1.12, 0.92);
+  }
+}
+.blowpanel {
+  display: flex;
+  align-items: center;
+  gap: 3cqh;
+  padding: 1cqh 3cqh;
+  margin-bottom: 1cqh;
+  border-radius: 3cqh;
+  background: rgb(255 255 255 / 85%);
+  border: 0.4cqh solid var(--ink);
+}
+.blownum {
+  font-weight: 400;
+  font-size: 10cqh;
+  line-height: 1;
+  color: #fff;
+  -webkit-text-stroke: 0.6cqh var(--ink);
+  paint-order: stroke fill;
+}
+.bslots {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1cqh;
+  max-width: 54cqh;
+}
+.bslot {
+  width: 4.4cqh;
+  height: 4.4cqh;
+  border-radius: 50%;
+  border: 0.4cqh solid var(--ink);
+  background: #fff;
+}
+.bslot.on {
+  background: var(--leaf);
+}
+
+/* 선 긋기: 게임판 좌표(126 × 83) 위의 SVG. 넓은 흰 길 위에 점선, 지나간 만큼 색 선(--line)이 채워진다 */
+.lineq {
+  display: block;
+  width: 100%;
+  height: 100%;
+  touch-action: none; /* 긋는 동안 화면이 같이 끌려가지 않게 */
+  user-select: none;
+  -webkit-user-select: none;
+  overflow: visible;
+}
+.lineq path {
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.lbed {
+  stroke: rgb(255 255 255 / 60%);
+  stroke-width: 12;
+}
+.lguide {
+  stroke: var(--ink);
+  stroke-width: 1.8;
+  stroke-dasharray: 0.1 4.4;
+  opacity: 0.6;
+}
+.lfill {
+  stroke: var(--line);
+  stroke-width: 6;
+}
+.lstart circle {
+  fill: var(--leaf);
+  stroke: var(--ink);
+  stroke-width: 0.8;
+}
+.lstart.hl circle,
+.lwalker.hl {
+  animation: lstart-pulse 0.5s ease-in-out 3;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+@keyframes lstart-pulse {
+  50% {
+    scale: 1.5;
+  }
+}
+.larrow {
+  fill: var(--leaf);
+  stroke: var(--ink);
+  stroke-width: 0.6;
+}
+.lhint {
+  fill: var(--sun);
+  stroke: var(--ink);
+  stroke-width: 0.6;
+  opacity: 0;
+  pointer-events: none;
+}
+.lhint.on {
+  opacity: 1;
+}
+.lgoal,
+.lwalker {
+  pointer-events: none;
+}

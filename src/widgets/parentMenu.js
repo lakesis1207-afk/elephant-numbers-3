@@ -1,26 +1,16 @@
-// 부모님 메뉴 (설정 버튼 2초 누르기로 열림). 4세 앱과 같은 구성과 모양. 부모님용이라 글자로 된 메뉴.
-// (3세 앱은 마을이 잠겨 있지 않아서 "모든 마을 열기"는 없다)
-import { h, button } from './dom.js';
+// 부모님 메뉴 (자물쇠 1초 누르기로 열림). 부모님용이라 글자로 된 메뉴.
+import { h } from '@공통/widgets/dom.js';
 import { remainingMs, MINUTE, moreTimeChange, testLimitChange, resetChange } from '../app/playtime.js';
-import { ALL_GAMES } from '../games/villages.js';
+import { SAVANNA } from '../villages/savanna.js';
 
-const MORE_MINUTES = 10;
-const DEFAULT_LIMIT_MIN = 10;
+const MORE_MINUTES = 15;
+const DEFAULT_LIMIT_MIN = 15;
 
-/** 글자 버튼 */
-const textButton = (label, onClick, cls = '') => {
-  const el = button(label, cls, onClick);
-  el.textContent = label;
-  return el;
-};
+/** 켜짐/꺼짐 버튼 */
+const toggle = (on, label, onclick) =>
+  h('button', { class: on ? 'on' : '', 'aria-pressed': String(on), 'aria-label': label, onclick }, on ? '켜짐' : '꺼짐');
 
-function row(title, ...controls) {
-  const el = h('div', 'row');
-  const ctrls = h('span', 'ctrls');
-  ctrls.append(...controls);
-  el.append(h('span', '', title), ctrls);
-  return el;
-}
+const row = (title, ...controls) => h('div', { class: 'row' }, h('span', {}, title), h('span', { class: 'ctrls' }, controls));
 
 export function createParentMenu(stage, app) {
   let modal = null;
@@ -41,46 +31,48 @@ export function createParentMenu(stage, app) {
   function render() {
     const p = app.progress;
     const left = Math.ceil(remainingMs(p) / MINUTE);
-    const current = app.current;
-    const inGame = current.name === 'game';
+    const inGame = app.current.name === 'game';
 
-    const resetBtn = textButton(resetArmed ? '한 번 더 누르면 지워져요' : '지우기', () => {
-      if (!resetArmed) {
-        resetArmed = true;
-        render();
-        return;
-      }
-      app.update(resetChange);
-      close();
-      app.go('map');
-      app.toast('진행 기록을 지웠어요');
-    }, resetArmed ? 'danger' : '');
-
-    const panel = h('div', 'panel');
-    panel.setAttribute('role', 'dialog');
-    panel.setAttribute('aria-modal', 'true');
-    panel.setAttribute('aria-label', '부모님 메뉴');
-    panel.append(
-      h('h3', '', '부모님 메뉴'),
-      h('div', 'left', `오늘 남은 놀이 시간: 약 ${left}분 · 스티커 ${p.stickers.length}/${ALL_GAMES.length}`),
-      row('놀이 시간', textButton(`${MORE_MINUTES}분 더 놀기`, () => apply((q) => moreTimeChange(q, MORE_MINUTES), `${MORE_MINUTES}분 더 놀 수 있어요`))),
-      row(
-        '시간 제한',
-        textButton(`${DEFAULT_LIMIT_MIN}분`, () => apply({ limitMin: DEFAULT_LIMIT_MIN }), p.limitMin === DEFAULT_LIMIT_MIN ? 'on' : ''),
-        textButton('1분 (시험용)', () => apply(testLimitChange, '1분 뒤에 잠겨요 (시험용)'), p.limitMin === 1 ? 'on' : ''),
-      ),
-      ...(inGame
-        ? [row('게임 그만하고 나가기', textButton('마을로 나가기', () => {
+    const resetBtn = h(
+      'button',
+      {
+        class: resetArmed ? 'danger' : '',
+        onclick: () => {
+          if (!resetArmed) {
+            resetArmed = true;
+            render();
+            return;
+          }
+          app.update(resetChange);
           close();
-          app.go('village', { village: current.params.village });
-        }))]
-        : []),
-      row('진행 기록 지우기', resetBtn),
-      textButton('닫기', close, 'close'),
+          app.go('map');
+          app.toast('진행 기록을 지웠어요');
+        },
+      },
+      resetArmed ? '한 번 더 누르면 지워져요' : '지우기',
     );
 
-    const next = h('div', 'modal');
-    next.append(panel);
+    const panel = h(
+      'div',
+      { class: 'panel', role: 'dialog', 'aria-modal': 'true', 'aria-label': '부모님 메뉴' },
+      h('h3', {}, '부모님 메뉴'),
+      h('div', { class: 'left' }, `오늘 남은 놀이 시간: 약 ${left}분 · 스티커 ${p.stickers.length}/${SAVANNA.animals.length}`),
+      row('놀이 시간', h('button', { onclick: () => apply((q) => moreTimeChange(q, MORE_MINUTES), `${MORE_MINUTES}분 더 놀 수 있어요`) }, `${MORE_MINUTES}분 더 놀기`)),
+      row(
+        '시간 제한',
+        h('button', { class: p.limitMin === DEFAULT_LIMIT_MIN ? 'on' : '', onclick: () => apply({ limitMin: DEFAULT_LIMIT_MIN }) }, `${DEFAULT_LIMIT_MIN}분`),
+        h('button', { class: p.limitMin === 1 ? 'on' : '', onclick: () => apply(testLimitChange, '1분 뒤에 잠겨요 (시험용)') }, '1분 (시험용)'),
+      ),
+      row('모든 마을 열기', toggle(p.allOpen, '모든 마을 열기', () => {
+        apply((q) => ({ allOpen: !q.allOpen }));
+        if (app.current.name === 'map') app.refresh();
+      })),
+      inGame ? row('게임 그만하고 나가기', h('button', { onclick: () => { close(); app.go('village', { village: app.current.params.village ?? 'savanna' }); } }, '마을로 나가기')) : null,
+      row('진행 기록 지우기', resetBtn),
+      h('button', { class: 'close', onclick: close }, '닫기'),
+    );
+
+    const next = h('div', { class: 'modal' }, panel);
     if (modal) modal.replaceWith(next);
     else stage.append(next);
     modal = next;
@@ -88,6 +80,7 @@ export function createParentMenu(stage, app) {
 
   return {
     open() {
+      app.sfx.ding();
       resetArmed = false;
       render();
     },

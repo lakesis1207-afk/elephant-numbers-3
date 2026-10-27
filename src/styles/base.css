@@ -1,0 +1,96 @@
+/* 기본 색과 화면 틀: 16:10 가로 무대를 화면 가운데에 놓는다. 크기는 무대 높이 기준(cqh). */
+:root {
+  color-scheme: light;
+  --ink: #3a2a1c;
+  --soft: #7a6450;
+  --card: #fffcf4;
+  --sun: #ffc83a;
+  --coral: #ff7a59;
+  --leaf: #3fae5e;
+  --sky: #bee6f7;
+  --night: #1e2a4a;
+  /* Jua 글꼴은 @fontsource/jua로 앱 안에 들어 있다(오프라인에서도 보임). */
+  --font: 'Jua', 'Apple SD Gothic Neo', 'Malgun Gothic', system-ui, sans-serif;
+}
+
+html,
+body {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  background: var(--night);
+  color: var(--ink);
+  font-family: var(--font);
+  overflow: hidden;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+  overscroll-behavior: none;
+}
+
+/*
+ * 화면 틀: 16:10보다 길쭉한 화면(휴대폰 등)은 무대가 화면을 꽉 채운다.
+ * 16:10보다 덜 길쭉한 화면(4:3 태블릿 등)은 게임판이 넘치지 않게 16:10을 지키고 위아래만 비운다.
+ * 크기는 무대 높이 기준(cqh)이라 화면이 길어져도 좌우 공간만 넓어진다.
+ */
+.wrap {
+  /* dvh: 휴대폰 주소창을 뺀 실제 보이는 높이. 지원하지 않는 브라우저는 앞줄(100%)을 쓴다. */
+  height: 100%;
+  height: 100dvh;
+  display: grid;
+  place-items: center;
+  box-sizing: border-box;
+  /* 카메라 구멍·노치가 있는 휴대폰은 그만큼만 안쪽으로 */
+  padding-left: env(safe-area-inset-left, 0px);
+  padding-right: env(safe-area-inset-right, 0px);
+}
+
+.stage {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  max-height: 62.5vw; /* = 화면 너비 ÷ 1.6 → 16:10보다 위아래로 커지지 않는다 */
+  container-type: size;
+  overflow: hidden;
+  background: var(--sky);
+}
+
+/* 16:10보다 덜 길쭉한 화면: 위아래가 비므로 예전처럼 둥근 모서리를 둔다 */
+@media (max-aspect-ratio: 16 / 10) {
+  .stage {
+    border-radius: 2.5cqh;
+  }
+}
+
+.screen {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3cqh;
+}
+
+/* 세로로 들면 안내만 보인다 (아이폰 사파리는 방향 고정이 안 되므로) */
+.rotate {
+  display: none;
+}
+
+@media (orientation: portrait) {
+  .wrap {
+    display: none;
+  }
+  .rotate {
+    position: fixed;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    padding: 16px;
+    text-align: center;
+    color: #fff;
+    font-size: 28px;
+  }
+}

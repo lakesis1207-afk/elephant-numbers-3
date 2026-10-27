@@ -1,22 +1,31 @@
 {
   "name": "elephant-numbers-3",
   "private": true,
-  "version": "0.0.1",
-  "description": "코끼리와 첫 숫자 놀이 — 3세용 수학 학습 웹앱 (틀 단계)",
+  "version": "0.1.0",
+  "description": "코끼리와 숫자친구들 (1단계) — 만 3세 숫자 놀이 웹앱",
   "type": "module",
   "scripts": {
+    "predev": "node scripts/voice-manifest.mjs",
     "dev": "vite",
+    "prebuild": "node scripts/voice-manifest.mjs",
     "build": "vite build",
     "preview": "vite preview",
     "test": "vitest run",
-    "voice:azure": "node scripts/azure-voice.mjs"
+    "test:watch": "vitest",
+    "test:e2e": "playwright test",
+    "voice:manifest": "node scripts/voice-manifest.mjs",
+    "voice:list": "node scripts/voice-list.mjs",
+    "icons": "node scripts/make-icons.mjs",
+    "voice:azure": "node scripts/azure-voice.mjs",
+    "art:villages": "node scripts/make-village-art.mjs"
   },
   "devDependencies": {
-    "sharp": "^0.35.5",
+    "@playwright/test": "^1.64.1",
     "vite": "^8.3.4",
     "vitest": "^5.0.5"
   },
   "dependencies": {
+    "@fontsource/dongle": "^5.3.0",
     "@fontsource/jua": "^5.3.0"
   }
 }

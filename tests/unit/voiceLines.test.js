@@ -1,51 +1,51 @@
-import { existsSync } from 'node:fs';
-import { describe, expect, it } from 'vitest';
+import { describe, test, expect } from 'vitest';
 import { VOICE_LINES, voiceIdOf } from '../../src/audio/voiceLines.js';
-import { GAME_KEYS, LEVELS, hintFor, makeQuestion } from '../../src/games/questions.js';
-import { PRAISE } from '../../src/games/logic.js';
-import { RETRY_TEXT, IDLE_TEXT } from '../../src/games/engine.js';
-import { ANIMAL_NAMES, VILLAGES } from '../../src/games/villages.js';
+import * as script from '../../src/audio/script.js';
+import { NATIVE, PRAISE } from '@공통/games/logic.js';
+import { RETRY_TEXT, IDLE_TEXT } from '@공통/games/engine.js';
 import { MISSIONS } from '../../src/app/playtime.js';
-import * as S from '../../src/audio/script.js';
-
-const VOICE_DIR = new URL('../../public/audio/voice/', import.meta.url);
+import { SAVANNA } from '../../src/villages/savanna.js';
 
 describe('음성 목록', () => {
-  it('파일 이름과 문장이 겹치지 않는다', () => {
-    expect(new Set(VOICE_LINES.map((l) => l.id)).size).toBe(VOICE_LINES.length);
-    expect(new Set(VOICE_LINES.map((l) => l.text)).size).toBe(VOICE_LINES.length);
+  test('파일 이름과 문장은 모두 한 번씩만 나온다', () => {
+    const ids = VOICE_LINES.map((l) => l.id);
+    const texts = VOICE_LINES.map((l) => l.text);
+    expect(new Set(ids).size).toBe(ids.length);
+    expect(new Set(texts).size).toBe(texts.length);
   });
 
-  it('게임 9개의 문제와 힌트가 모두 목록에 있다', () => {
-    for (const key of GAME_KEYS) {
-      expect(voiceIdOf(hintFor(key))).not.toBeNull();
-      for (const range of LEVELS) {
-        for (let i = 0; i < 200; i++) expect(voiceIdOf(makeQuestion(key, { range }).prompt), key).not.toBeNull();
-      }
+  test('파일 이름은 영문 소문자·숫자·하이픈만 쓴다', () => {
+    VOICE_LINES.forEach(({ id }) => expect(id).toMatch(/^[a-z0-9]+(-[a-z0-9]+)*$/));
+  });
+
+  test('수 세기, 칭찬, 다시 세기, 알림이 모두 들어 있다', () => {
+    expect(voiceIdOf(NATIVE[3])).toBe('count-3');
+    PRAISE.forEach((p) => expect(voiceIdOf(p)).toBeTruthy());
+    expect(voiceIdOf(RETRY_TEXT)).toBeTruthy();
+    expect(voiceIdOf(IDLE_TEXT)).toBeTruthy();
+    expect(voiceIdOf(script.WARN_TEXT)).toBeTruthy();
+  });
+
+  test('게임 문제와 힌트는 나올 수 있는 수만큼 모두 들어 있다', () => {
+    for (let n = 1; n <= 10; n++) expect(voiceIdOf(script.fruitHintEnd(n))).toBeTruthy();
+    for (let n = 1; n <= 6; n++) {
+      expect(voiceIdOf(script.pondPrompt(n))).toBeTruthy();
+      expect(voiceIdOf(script.spotsHintEnd(n))).toBeTruthy();
     }
+    for (let k = 2; k <= 8; k++) expect(voiceIdOf(script.pondTooMany(k))).toBeTruthy();
+    expect(voiceIdOf(script.fruitPrompt('귤', '이'))).toBe('fruit-q-orange');
   });
 
-  it('게임 밖 대사(인사, 지도, 칭찬, 스티커, 스티커북, 마을, 시간·잠금)도 모두 목록에 있다', () => {
-    const names = Object.values(ANIMAL_NAMES);
-    const texts = [
-      S.GREETING, S.MAP_WORD, S.MAP_GUIDE, S.WARN_TEXT, S.UNLOCK_TEXT, S.NOT_MET, RETRY_TEXT, IDLE_TEXT, ...PRAISE,
-      ...VILLAGES.flatMap((v) => [v.intro, S.villageComplete(v.name)]),
-      ...names.flatMap((n) => [n, S.stickerLine(n, true), S.stickerLine(n, false)]),
-      ...Array.from({ length: 10 }, (_, n) => S.bookCount(n)),
-      ...MISSIONS.map(S.lockLine),
-    ];
-    for (const t of texts) expect(voiceIdOf(t), t).not.toBeNull();
+  test('스티커·잠금 문장도 들어 있다', () => {
+    SAVANNA.animals.forEach((a) => {
+      expect(voiceIdOf(script.stickerLine(a.name, true))).toBeTruthy();
+      expect(voiceIdOf(script.stickerLine(a.name, false, '숲속 마을'))).toBeTruthy();
+      expect(voiceIdOf(a.name)).toBeTruthy();
+    });
+    MISSIONS.forEach((m) => expect(voiceIdOf(script.lockLine(m))).toBeTruthy());
   });
 
-  it('4세 앱에서 복사한 녹음이 있다 (지도, 잠금, 스티커, 스티커북 등)', () => {
-    const animals = ['chick', 'rabbit', 'pig', 'squirrel', 'panda', 'owl', 'crab', 'turtle'];
-    const copied = [
-      'idle', 'praise-2', 'praise-5', 'map', 'unlock', 'not-met',
-      ...Array.from({ length: 10 }, (_, i) => `count-${i + 1}`),
-      ...Array.from({ length: 10 }, (_, i) => `book-${i}`),
-      ...MISSIONS.map((_, i) => `lock-${i + 1}`),
-      ...animals.flatMap((a) => [`name-${a}`, `sticker-${a}`, `sticker-again-${a}`]),
-    ];
-    for (const id of copied) expect(existsSync(new URL(`${id}.mp3`, VOICE_DIR)), id).toBe(true);
+  test('목록에 없는 문장은 null', () => {
+    expect(voiceIdOf('없는 문장')).toBeNull();
   });
 });
