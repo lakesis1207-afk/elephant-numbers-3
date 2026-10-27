@@ -1,6 +1,6 @@
 // 음성 목록 만들기 (npm run voice:list) — 앱 대사(src/audio)가 바뀌면 다시 실행한다.
 // docs/음성 목록.md : 파일 이름 ↔ 문장 목록. 녹음은 npm run voice:azure 로 만든다.
-import { writeFileSync } from 'node:fs';
+import { mkdirSync, writeFileSync } from 'node:fs';
 import { VOICE_LINES } from '../src/audio/voiceLines.js';
 
 const groups = [...new Set(VOICE_LINES.map((l) => l.group))];
@@ -19,5 +19,6 @@ for (const g of groups) {
   out.push('', `## ${g} (${linesOf(g).length}개)`, '', '| 파일 이름 | 문장 |', '|---|---|');
   linesOf(g).forEach((l) => out.push(`| ${l.id}.mp3 | ${cell(l.text)} |`));
 }
+mkdirSync(new URL('../docs/', import.meta.url), { recursive: true });
 writeFileSync(new URL('../docs/음성 목록.md', import.meta.url), `${out.join('\n')}\n`);
 console.log(`[voice] 음성 목록을 만들었어요 (${VOICE_LINES.length}문장).`);

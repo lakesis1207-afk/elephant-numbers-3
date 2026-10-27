@@ -1,7 +1,8 @@
 // Azure 음성(TTS)으로 대사 녹음 만들기 (npm run voice:azure [-- --limit 3])
 // 문장마다 public/audio/voice/<파일 이름>.mp3 로 저장하고, 끝나면 녹음 목록(manifest)을 다시 만든다.
 // 키는 파일에 적지 않고 실행할 때 환경 변수로 넣는다: AZURE_SPEECH_KEY, AZURE_SPEECH_REGION (예: koreacentral)
-// 이미 Azure로 만든 문장은 건너뛴다(기록: 프로젝트 밖 ../녹음 원본/azure-done.json, 파일 이름 → 만든 문장).
+// 이미 Azure로 만든 문장은 건너뛴다(기록: 프로젝트 밖 ../녹음 원본/azure-done-1단계.json, 파일 이름 → 만든 문장).
+// 2단계 앱(azure-done.json)과 기록을 나눠서, 같은 파일 이름의 다른 문장을 서로 덮어 녹음하지 않게 한다.
 // 문장 글자가 바뀌었으면 다시 만든다. 전부 다시 만들려면 --force.
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname } from 'node:path';
@@ -17,7 +18,7 @@ const BUSY_WAIT_MS = 15000; // 너무 많이 보냈다(429)고 하면 기다렸�
 const MAX_TRIES = 4;
 
 const OUT_DIR = fileURLToPath(new URL('../public/audio/voice/', import.meta.url));
-const DONE_FILE = fileURLToPath(new URL('../../녹음 원본/azure-done.json', import.meta.url));
+const DONE_FILE = fileURLToPath(new URL('../../녹음 원본/azure-done-1단계.json', import.meta.url));
 
 const key = process.env.AZURE_SPEECH_KEY;
 const region = process.env.AZURE_SPEECH_REGION;

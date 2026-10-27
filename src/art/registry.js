@@ -5,11 +5,11 @@ const BASE = `${import.meta.env.BASE_URL}images/`;
 // 그려 둔 캐릭터 (webp)
 const DRAWN_CHARACTERS = [
   'elephant', 'giraffe', 'hippo', 'rhino', 'lion', 'tiger', 'zebra', 'lemur', 'capybara',
-  'rabbit', 'penguin', 'trex',
-  'squirrel', 'crab', 'chick', 'pig',
+  'rabbit', 'penguin',
+  'squirrel', 'crab',
   'panda', 'fox', 'owl', 'hedgehog',
   'polarbear', 'walrus', 'whale', 'turtle', 'dolphin', 'starfish', 'seaotter',
-  'octopus', 'brachio', 'stego', 'ptera', 'dog', 'cat',
+  'octopus',
 ];
 // 아직 그림이 없어 자리 표시용 그림(svg)을 쓰는 캐릭터. 그림을 그리면 webp로 넣고 위 목록으로 옮긴다.
 // (npm run art:villages 로 다시 만든다)
@@ -19,19 +19,17 @@ const ICONS = [
   'game-fruit', 'game-pond', 'game-spots',
 ];
 const BACKGROUNDS = [
-  'savanna-base', 'forest-base', 'sea-base', 'dino-base', 'farm-base',
+  'savanna-base', 'forest-base', 'sea-base',
   'night-base', // 잠금 화면
 ];
 const PROPS = [
   'fruit-apple', 'fruit-strawberry', 'fruit-orange', 'fruit-banana', 'fruit-grape', 'fruit-peach',
   'giraffe-spot', 'bush', 'pond',
-  'balloon-red', 'balloon-blue', 'balloon-yellow', 'balloon-green', 'tree', 'acorn',
-  'fish', 'shell', 'star', 'net',
-  'board', 'footprint', 'egg', 'dino-egg', 'nest',
-  'basket', 'corn',
+  'balloon-red', 'balloon-blue', 'balloon-yellow', 'balloon-green', 'acorn',
+  'fish', 'shell', 'star',
 ];
 // 그려 둔 소품 (webp). 나머지 소품은 svg를 쓴다.
-const DRAWN_PROPS = ['fish', 'shell', 'footprint', 'dino-egg'];
+const DRAWN_PROPS = ['fish', 'shell'];
 // 그려 둔 아이콘·배경 (webp)
 const DRAWN_ICONS = ['settings', 'speaker', 'star'];
 const DRAWN_BACKGROUNDS = BACKGROUNDS; // 배경은 모두 그림

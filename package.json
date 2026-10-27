@@ -14,9 +14,9 @@
     "test:watch": "vitest",
     "test:e2e": "playwright test",
     "voice:manifest": "node scripts/voice-manifest.mjs",
-    "voice:list": "node scripts/voice-list.mjs",
+    "voice:list": "node --import ./scripts/common-alias.mjs scripts/voice-list.mjs",
     "icons": "node scripts/make-icons.mjs",
-    "voice:azure": "node scripts/azure-voice.mjs",
+    "voice:azure": "node --import ./scripts/common-alias.mjs scripts/azure-voice.mjs",
     "art:villages": "node scripts/make-village-art.mjs"
   },
   "devDependencies": {
