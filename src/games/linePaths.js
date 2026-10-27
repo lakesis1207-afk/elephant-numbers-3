@@ -2,6 +2,8 @@
 // 모양마다 3단계: 직선(가로 → 비스듬히 → 길고 가파르게), 곡선(호 → S자 → 물결), 지그재그(꺾임 2 → 4 → 6번).
 // 모두 왼쪽에서 오른쪽으로 간다(읽는 방향). 위아래를 뒤집은 모양도 함께 써서 다양하게 한다.
 export const VIEW = Object.freeze({ width: 126, height: 83 });
+// 길 시작·끝에 서는 동물·목표 그림 크기. 그림은 점 위로 서므로 시작·끝 점은 위에서 이만큼 떨어져 있어야 한다
+export const LINE_ICON = 22;
 export const LINE_KINDS = Object.freeze(['straight', 'curve', 'zigzag']);
 export const LEVELS = 3;
 const TOLERANCE = [9, 8, 7]; // 길에서 이만큼 벗어나도 이어진다 (단계가 오를수록 조금 좁게)
@@ -32,11 +34,11 @@ const SHAPES = {
   straight: [
     [[[16, 30], [110, 30]], [[16, 44], [110, 44]], [[16, 58], [110, 58]]],
     withFlip([[16, 60], [110, 26]]),
-    withFlip([[12, 70], [114, 14]]),
+    withFlip([[12, 61], [114, 22]]),
   ],
   curve: [
     withFlip(cubic([16, 58], [40, 16], [86, 16], [110, 58])),
-    withFlip(cubic([16, 62], [70, 62], [56, 22], [110, 22])),
+    withFlip(cubic([16, 61], [70, 61], [56, 22], [110, 22])),
     withFlip(chain(cubic([14, 42], [26, 10], [50, 10], [62, 42]), cubic([62, 42], [74, 74], [98, 74], [112, 42]))),
   ],
   zigzag: [

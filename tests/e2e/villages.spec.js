@@ -68,6 +68,14 @@ test('숲속 마을 · 풍선 불기: 누를 때마다 커지고, 수만큼 누�
   expect(await scaleOf()).toBe(1);
   await expect(page.locator('.play .bslot')).toHaveCount(answer);
 
+  // 숫자는 풍선 왼쪽에 크게, 검은색으로 보인다
+  const num = page.locator('.play .blownum');
+  await expect(num).toHaveText(String(answer));
+  const [numBox, balloonBox] = [await num.boundingBox(), await balloon.boundingBox()];
+  expect(numBox.x + numBox.width).toBeLessThan(balloonBox.x);
+  expect(numBox.height).toBeGreaterThan(balloonBox.height * 0.8);
+  expect(await num.evaluate((el) => getComputedStyle(el).color)).toBe('rgb(17, 17, 17)');
+
   // 가만있으면 풍선이 반짝이며 눌러 보라고 알려 준다
   await expect(balloon).toHaveClass(/hl/, { timeout: 8000 });
 

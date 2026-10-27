@@ -1,10 +1,19 @@
 import { describe, test, expect } from 'vitest';
 import { balloonGame, BALLOON_CHOICES } from '../../src/games/savanna/balloon.js';
 import { pickDistinct } from '@공통/games/questions.js';
+import { PRAISE } from '@공통/games/logic.js';
 
 describe('풍선 터뜨리기 (1단계, 만 3세)', () => {
   test('난이도는 1~4 → 1~7 → 1~10 이다', () => {
     expect(balloonGame.levels).toEqual([[1, 4], [1, 7], [1, 10]]);
+  });
+
+  test('칭찬에 "세다" 말이 없고, 모두 녹음이 있는 기본 칭찬 중에서 고른다', () => {
+    expect(balloonGame.praise.length).toBeGreaterThanOrEqual(3);
+    balloonGame.praise.forEach((p) => {
+      expect(p).not.toMatch(/세었|셌|세어/);
+      expect(PRAISE).toContain(p);
+    });
   });
 
   test('풍선은 3개다', () => {

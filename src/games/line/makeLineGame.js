@@ -5,11 +5,10 @@
 import { pickHandler, replayClass } from '@공통/games/widgets.js';
 import { artUrl } from '../../art/registry.js';
 import { buildPath, pointAt, startTrace, pressTrace, moveTrace, releaseTrace, isDone } from '../lineTrace.js';
-import { VIEW, pickPath, toleranceFor } from '../linePaths.js';
+import { VIEW, LINE_ICON as ICON, pickPath, toleranceFor } from '../linePaths.js';
 import { LINE_START_HINT, LINE_IDLE_HINT } from '../../audio/villageScript.js';
 
 const SVG_NS = 'http://www.w3.org/2000/svg';
-const ICON = 15; // 동물·목표 그림 크기 (게임판 좌표)
 const START_DOT = 4.4;
 const ARROW_AT = 11; // 시작 화살표를 놓는 거리 (길을 따라)
 const IDLE_HINT_MS = 5000;
@@ -89,10 +88,10 @@ export function makeLineGame({ key, background, kind, traveler, goal, prompt, co
         svg('path', { class: 'lbed', d }),
         svg('path', { class: 'lguide', d }),
         fill,
-        start,
-        arrow,
         goalImg,
         walker,
+        start, // 초록 점은 동물보다 위에: 동물이 점 위에 서도 점이 다 보인다
+        arrow,
         hintDot,
       );
       if (EXPOSE_PATH) board.dataset.path = JSON.stringify(shape.points.map(([x, y]) => [round2(x), round2(y)]));

@@ -1,7 +1,7 @@
 // 풍선 터뜨리기 (사바나, 1~10 숫자 알아보기): "숫자 칠 풍선을 터뜨려 줘!" → 숫자 풍선 3개 중 골라 누른다.
 // 힌트: 정답 풍선이 반짝이고 "이게 숫자 칠 풍선이야!"
 import { h, art } from '@공통/widgets/dom.js';
-import { pickNumber, wait } from '@공통/games/logic.js';
+import { pickNumber, wait, PRAISE } from '@공통/games/logic.js';
 import { pickHandler } from '@공통/games/widgets.js';
 import { pickDistinct } from '@공통/games/questions.js';
 import { balloonPrompt, BALLOON_HINT, balloonHintEnd } from '../../audio/villageScript.js';
@@ -10,7 +10,11 @@ import { BALLOON_COLORS as COLORS, PIECE_COLORS, popBalloon } from '../balloonFx
 export const BALLOON_CHOICES = 3; // 만 3세가 고르기 쉽게 풍선은 3개
 const HINT_MS = 1600;
 
+// 숫자 풍선을 찾아 고르는 게임이라 "세었네" 칭찬은 어색하다. 세다 말이 없는 기본 칭찬만 쓴다 (모두 녹음이 있다)
+const BALLOON_PRAISE = Object.freeze(PRAISE.filter((p) => !/세었|셌|세어/.test(p)));
+
 export const balloonGame = {
+  praise: BALLOON_PRAISE,
   key: 'balloon',
   background: 'savanna-base',
   levels: [

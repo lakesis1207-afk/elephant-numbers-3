@@ -1,5 +1,5 @@
 import { describe, test, expect } from 'vitest';
-import { VIEW, LINE_KINDS, LEVELS, pathsFor, pickPath, toleranceFor } from '../../src/games/linePaths.js';
+import { VIEW, LINE_ICON, LINE_KINDS, LEVELS, pathsFor, pickPath, toleranceFor } from '../../src/games/linePaths.js';
 import { buildPath } from '../../src/games/lineTrace.js';
 
 const MARGIN = 8;
@@ -37,6 +37,23 @@ describe('길 모양', () => {
       });
     },
   );
+
+  test.each(LINE_KINDS.flatMap((kind) => [0, 1, 2].map((level) => [kind, level])))(
+    '%s 단계 %i: 시작·끝에 서는 동물·목표 그림이 게임판 밖으로 나가지 않는다',
+    (kind, level) => {
+      pathsFor(kind, level).forEach(({ points }) => {
+        [points[0], points.at(-1)].forEach(([x, y]) => {
+          expect(y).toBeGreaterThanOrEqual(LINE_ICON); // 그림은 점 위로 선다
+          expect(x).toBeGreaterThanOrEqual(LINE_ICON / 2);
+          expect(x).toBeLessThanOrEqual(VIEW.width - LINE_ICON / 2);
+        });
+      });
+    },
+  );
+
+  test('동물·목표 그림은 예전(15)보다 크게 보인다', () => {
+    expect(LINE_ICON).toBeGreaterThanOrEqual(22);
+  });
 
   test('모양 번호(id)는 한 종류 안에서 서로 다르다', () => {
     LINE_KINDS.forEach((kind) => {

@@ -1,4 +1,4 @@
-// 풍선 불기 (숲속, 1~10 세기): 아래에 숫자를 보여 주고, 그 수만큼 풍선을 누르면 누를 때마다 커지다가 마지막에 펑!
+// 풍선 불기 (숲속, 1~10 세기): 풍선 옆에 숫자를 크게 보여 주고, 그 수만큼 풍선을 누르면 누를 때마다 커지다가 마지막에 펑!
 // 틀림이 없다: 정해진 수만큼 누르면 저절로 터진다. 한동안 안 누르면 풍선이 반짝이며 눌러 보라고 알려 준다.
 import { h, art } from '@공통/widgets/dom.js';
 import { NATIVE, pickNumber } from '@공통/games/logic.js';
@@ -60,8 +60,8 @@ export const blowGame = {
       h(
         'div',
         { class: 'blowq' },
-        h('div', { class: 'blowstage' }, balloon),
-        h('div', { class: 'blowpanel' }, h('b', { class: 'blownum' }, String(n)), h('span', { class: 'bslots' }, slots)),
+        h('div', { class: 'blowstage' }, h('b', { class: 'blownum' }, String(n)), balloon), // 숫자는 풍선 왼쪽에 크게
+        h('div', { class: 'blowpanel' }, h('span', { class: 'bslots' }, slots)),
       ),
     );
     armIdle();

@@ -46,6 +46,15 @@ describe('게임 흐름', () => {
     expect(asked).toHaveLength(2);
   });
 
+  test('칭찬 목록(praise)을 주면 그 안에서만 칭찬한다', async () => {
+    const fx = { say: vi.fn(), bubble: vi.fn(), cheer: vi.fn(), sfx: { yes: vi.fn(), boing: vi.fn() } };
+    const ask = (info) => ({ n: info.range[0], hint: async () => {} });
+    const run = createGameRun({ levels: LEVELS, fx, ask, praise: ['우와, 맞았어!'] });
+    run.start();
+    await run.answer(true);
+    expect(fx.say).toHaveBeenCalledWith('우와, 맞았어!');
+  });
+
   test('정답 효과가 끝나기 전 다시 누르면 무시한다', async () => {
     const { run, onProgress } = setup();
     run.start();
