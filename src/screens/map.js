@@ -43,6 +43,7 @@ function villageCard(village, app) {
 }
 
 export const mapScreen = {
+  background: 'savanna-numbers',
   render(root, app) {
     root.append(h('div', { class: 'path' }, VILLAGES.map((v) => villageCard(v, app))));
   },

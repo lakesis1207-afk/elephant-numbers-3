@@ -9,7 +9,7 @@ test('설치 정보(manifest)와 아이콘이 있다', async ({ page, request, b
   const res = await request.get(new URL(href, baseURL).href);
   expect(res.ok()).toBe(true);
   const manifest = await res.json();
-  expect(manifest).toMatchObject({ name: '코끼리와 숫자친구들 (1단계)', display: 'fullscreen', orientation: 'landscape', start_url: './' });
+  expect(manifest).toMatchObject({ name: '코끼리와 숫자 친구들 (1단계)', display: 'fullscreen', orientation: 'landscape', start_url: './' });
   for (const icon of manifest.icons) {
     expect((await request.get(new URL(icon.src, baseURL).href)).ok(), icon.src).toBe(true);
   }

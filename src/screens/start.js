@@ -20,6 +20,7 @@ function enterFullscreen() {
 
 export const startScreen = {
   showBar: false,
+  background: 'savanna-numbers',
   render(root, app) {
     const start = () => {
       enterFullscreen();
@@ -31,7 +32,7 @@ export const startScreen = {
     root.addEventListener('pointerdown', enterFullscreen, { once: true });
     root.append(
       art('character', 'elephant', { class: 'hero', alt: '코끼리' }),
-      h('h1', {}, '코끼리와 숫자 친구들'),
+      h('h1', {}, '코끼리와 숫자 친구들 (1단계)'),
       roundButton('play', '시작', start),
     );
   },
